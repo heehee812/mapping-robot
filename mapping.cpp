@@ -6,9 +6,32 @@ typedef pair<int, int> Pos;
 typedef queue<Pos> Queue;
 typedef stack<Pos> Stack;
 int row, col, Battery, dir= 1;
-Pos R;
 
 /*class*/
+class Point{
+    private:
+        Pos up, down, left, right;
+    public:
+        Pos pos;
+        Pos get_up(){ 
+            up= make_pair(pos.first-1, pos.second);
+            return up;
+        }
+        Pos get_down(){
+            down= make_pair(pos.first+1, pos.second);
+            return down;
+        }
+        Pos get_left(){
+            left= make_pair(pos.first, pos.second-1);
+            return left;
+        }
+        Pos get_right(){
+            right= make_pair(pos.first, pos.second+1);
+            return right;
+        }
+};
+Point R;
+
 class Floor{
     private:
         int **floor;
@@ -23,83 +46,7 @@ class Floor{
                 cout<<endl;
             }
         }
-        void around_point(Pos ptr){
-            // //decide what direction should go
-            // if(ptr.first!= row-1){
-            //     cout<<"ptr.first!= bottom"<<endl;
-            //     if(floor[ptr.first+1][ptr.second]== 0){
-            //         cout<<ptr.first+1<<","<<ptr.second<<endl;
-            //         readyQueue.push(make_pair(ptr.first+1, ptr.second));
-            //         if(dir){
-            //             if(floor[ptr.first+1][ptr.second-1]== 0){
-            //                 cout<<ptr.first+1<<","<<ptr.second-1<<endl;
-            //                 readyQueue.push(make_pair(ptr.first-1, ptr.second-1));
-            //             }
-            //         }
-            //         else{
-            //             if(floor[ptr.first+1][ptr.second+1]== 0){
-            //                 cout<<ptr.first+1<<","<<ptr.second+1<<endl;
-            //                 readyQueue.push(make_pair(ptr.first-1, ptr.second+1));
-            //             }
-            //         }
-            //     }
-            // }
-            // if(dir){
-            //     cout<<"dir=1"<<endl;
-            //     if(floor[ptr.first][ptr.second-1]== 0){
-            //         cout<<ptr.first<<","<<ptr.second-1<<endl;
-            //         readyQueue.push(make_pair(ptr.first, ptr.second-1));
-            //         if(floor[ptr.first-1][ptr.second-1]== 0){
-            //             cout<<ptr.first-1<<","<<ptr.second-1<<endl;
-            //             readyQueue.push(make_pair(ptr.first-1, ptr.second-1));
-            //         }
-            //     }
-            //     if(floor[ptr.first-1][ptr.second]== 0){
-            //         cout<<ptr.first-1<<","<<ptr.second<<endl;
-            //         readyQueue.push(make_pair(ptr.first-1, ptr.second));
-            //         if(floor[ptr.first-1][ptr.second+1]== 0){
-            //             cout<<ptr.first-1<<","<<ptr.second+1<<endl;
-            //             readyQueue.push(make_pair(ptr.first-1, ptr.second+1));
-            //         }
-            //     }
-            //     if(floor[ptr.first][ptr.second+1]== 0){
-            //         cout<<ptr.first<<","<<ptr.second+1<<endl;
-            //         readyQueue.push(make_pair(ptr.first, ptr.second+1));
-            //         if(ptr.first!= 0)
-            //             if(floor[ptr.first+1][ptr.second+1]== 0){
-            //                 cout<<ptr.first+1<<","<<ptr.second+1<<endl;
-            //                 readyQueue.push(make_pair(ptr.first+1, ptr.second+1));
-            //             }
-            //     }
-            // }
-            // else{
-            //     if(floor[ptr.first][ptr.second+1]== 0){
-            //         cout<<ptr.first<<","<<ptr.second-1<<endl;
-            //         readyQueue.push(make_pair(ptr.first, ptr.second+1));
-            //         if(floor[ptr.first-1][ptr.second]== 0){
-            //             cout<<ptr.first-1<<","<<ptr.second<<endl;
-            //             readyQueue.push(make_pair(ptr.first-1, ptr.second+1));
-            //         }
-            //     }
-            //     if(floor[ptr.first-1][ptr.second]== 0){
-            //         cout<<ptr.first-1<<","<<ptr.second<<endl;
-            //         readyQueue.push(make_pair(ptr.first-1, ptr.second));
-            //         if(floor[ptr.first-1][ptr.second-1]== 0){
-            //             cout<<ptr.first-1<<","<<ptr.second-1<<endl;
-            //             readyQueue.push(make_pair(ptr.first-1, ptr.second-1));
-            //         }
-            //     }
-            //     if(floor[ptr.first][ptr.second-1]== 0){
-            //         cout<<ptr.first<<","<<ptr.second-1<<endl;
-            //         readyQueue.push(make_pair(ptr.first, ptr.second-1));
-            //         if(ptr.first!= 0)
-            //             if(floor[ptr.first+1][ptr.second-1]== 0){
-            //                 cout<<ptr.first+1<<","<<ptr.second-1<<endl;
-            //                 readyQueue.push(make_pair(ptr.first+1, ptr.second-1));
-            //             }
-            //     }
-            // }
-        }
+        void around_point(Pos ptr){}
         void print_readyQueue(){
             Queue copy= readyQueue;
             while(!copy.empty()){
@@ -129,10 +76,12 @@ int main(int argc, char *argv[]){
             ifile>> c;
             floor[j][i]= c-'0';
             if(c== 'R')
-                R= make_pair(j, i);
+                R.pos= make_pair(j, i);
         }
     }
     Floor fr(floor);
-    fr.around_point(make_pair(3, 4));
+    // fr.around_point(R);
     // fr.print_readyQueue();
+    // cout<<"R= "<<R.pos.first<<", "<<R.pos.second<<endl;
+    // cout<<"R.right= "<<R.get_right().first<<", "<<R.get_right().second<<endl;
 ;}
