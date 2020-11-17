@@ -35,10 +35,9 @@ class Point{
 Point R;
 
 class Floor{
-    private:
+    public:
         Queue readyQueue;
         Stack waitingStack;
-    public:
         Point **floor;
         Floor(){
             floor= new Point*[row];
@@ -56,106 +55,106 @@ class Floor{
             }
         }
         void around_point(Point ptr, int way){
-                switch(way){
-                    case(UP):{
-                        if(floor[ptr.get_up().first][ptr.get_up().second].val== 0){
-                                readyQueue.push(ptr.get_up());
-                                if(dir){
-                                    if(floor[ptr.get_up().first][ptr.get_up().second+1].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_up().first, ptr.get_up().second+1));
-                                        around_point(ptr, RIGHT);
-                                    }
+            switch(way){
+                case(UP):{
+                    if(floor[ptr.get_up().first][ptr.get_up().second].val== 0){
+                            readyQueue.push(ptr.get_up());
+                            if(dir){
+                                if(floor[ptr.get_up().first][ptr.get_up().second+1].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_up().first, ptr.get_up().second+1));
+                                    around_point(ptr, RIGHT);
                                 }
-                                else{
-                                    if(floor[ptr.get_up().first][ptr.get_up().second-1].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_up().first, ptr.get_up().second-1));
-                                        around_point(ptr, LEFT);
-                                    }
+                            }
+                            else{
+                                if(floor[ptr.get_up().first][ptr.get_up().second-1].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_up().first, ptr.get_up().second-1));
+                                    around_point(ptr, LEFT);
                                 }
+                            }
+                    }
+                    else if(readyQueue.empty()){
+                        if(dir)
+                            around_point(ptr, RIGHT);
+                        else
+                            around_point(ptr, LEFT);
+                    }
+                    break;
+                }
+                case(DOWN):{
+                    if(ptr.pos.first!= row-1){
+                        if(floor[ptr.get_down().first][ptr.get_down().second].val== 0){
+                            readyQueue.push(ptr.get_down());
+                            if(dir){
+                                if(floor[ptr.get_down().first][ptr.get_down().second-1].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_down().first, ptr.get_down().second-1));
+                                    around_point(ptr, LEFT);
+                                }
+                            }
+                            else{
+                                if(floor[ptr.get_down().first][ptr.get_down().second+1].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_down().first, ptr.get_down().second+1));
+                                    around_point(ptr, RIGHT);
+                                }
+                            }
                         }
                         else if(readyQueue.empty()){
                             if(dir)
-                                around_point(ptr, RIGHT);
-                            else
-                                around_point(ptr, LEFT);
-                        }
-                        break;
-                    }
-                    case(DOWN):{
-                        if(ptr.pos.first!= row-1){
-                            if(floor[ptr.get_down().first][ptr.get_down().second].val== 0){
-                                readyQueue.push(ptr.get_down());
-                                if(dir){
-                                    if(floor[ptr.get_down().first][ptr.get_down().second-1].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_down().first, ptr.get_down().second-1));
-                                        around_point(ptr, LEFT);
-                                    }
-                                }
-                                else{
-                                    if(floor[ptr.get_down().first][ptr.get_down().second+1].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_down().first, ptr.get_down().second+1));
-                                        around_point(ptr, RIGHT);
-                                    }
-                                }
-                            }
-                            else if(readyQueue.empty()){
-                                if(dir)
-                                    around_point(ptr, LEFT);
-                                else
-                                    around_point(ptr, RIGHT);
-                            }
-                        }
-                        else{
-                            if(dir)
                                 around_point(ptr, LEFT);
                             else
                                 around_point(ptr, RIGHT);
                         }
-                        break;
                     }
-                    case(LEFT):{
-                        if(floor[ptr.get_left().first][ptr.get_left().second].val== 0){
-                                readyQueue.push(ptr.get_left());
-                                if(dir){
-                                    if(floor[ptr.get_left().first-1][ptr.get_left().second].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_left().first-1, ptr.get_left().second));
-                                        around_point(ptr, UP);
-                                    }
-                                }
-                                else{
-                                    if(floor[ptr.get_left().first+1][ptr.get_left().second].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_left().first+1, ptr.get_left().second));
-                                    }
-                                }
-                        }
-                        else if(readyQueue.empty()&&dir){
-                            if(dir)
-                                around_point(ptr, UP);
-                        }
-                        break;
+                    else{
+                        if(dir)
+                            around_point(ptr, LEFT);
+                        else
+                            around_point(ptr, RIGHT);
                     }
-                    case(RIGHT):{
-                        if(floor[ptr.get_right().first][ptr.get_right().second].val== 0){
-                                readyQueue.push(ptr.get_right());
-                                if(dir){
-                                    if(floor[ptr.get_right().first+1][ptr.get_right().second].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_right().first+1, ptr.get_right().second));
-                                    }
-                                }
-                                else{
-                                    if(floor[ptr.get_right().first-1][ptr.get_right().second].val== 0){
-                                        readyQueue.push(make_pair(ptr.get_right().first-1, ptr.get_right().second));
-                                        around_point(ptr, UP);
-                                    }
-                                }
-                        }
-                        else if(readyQueue.empty()&&!dir){
-                            around_point(ptr, UP);
-                        }
-                        break;
-                    }
-                    default: break;
+                    break;
                 }
+                case(LEFT):{
+                    if(floor[ptr.get_left().first][ptr.get_left().second].val== 0){
+                            readyQueue.push(ptr.get_left());
+                            if(dir){
+                                if(floor[ptr.get_left().first-1][ptr.get_left().second].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_left().first-1, ptr.get_left().second));
+                                    around_point(ptr, UP);
+                                }
+                            }
+                            else{
+                                if(floor[ptr.get_left().first+1][ptr.get_left().second].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_left().first+1, ptr.get_left().second));
+                                }
+                            }
+                    }
+                    else if(readyQueue.empty()&&dir){
+                        if(dir)
+                            around_point(ptr, UP);
+                    }
+                    break;
+                }
+                case(RIGHT):{
+                    if(floor[ptr.get_right().first][ptr.get_right().second].val== 0){
+                            readyQueue.push(ptr.get_right());
+                            if(dir){
+                                if(floor[ptr.get_right().first+1][ptr.get_right().second].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_right().first+1, ptr.get_right().second));
+                                }
+                            }
+                            else{
+                                if(floor[ptr.get_right().first-1][ptr.get_right().second].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_right().first-1, ptr.get_right().second));
+                                    around_point(ptr, UP);
+                                }
+                            }
+                    }
+                    else if(readyQueue.empty()&&!dir){
+                        around_point(ptr, UP);
+                    }
+                    break;
+                }
+                default: break;
+            }
         }
         void print_readyQueue(){
             Queue copy= readyQueue;
@@ -166,12 +165,11 @@ class Floor{
             cout<<endl;
         }
         void update_floor(){
-            put_queue_to_stack();
-        }
-        void put_queue_to_stack(){
             while(!readyQueue.empty()){
-                waitingStack.push(readyQueue.front());
+                Pos tmp= readyQueue.front();
                 readyQueue.pop();
+                floor[tmp.first][tmp.second].val= 2;
+                waitingStack.push(tmp);
             }
         }
         void print_waitingStack(){
@@ -204,6 +202,20 @@ int main(int argc, char *argv[]){
                 R.pos= make_pair(j, i);
         }
     }
-    fr.around_point(R, DOWN);
-    fr.update_floor();
+
+    fr.waitingStack.push(R.pos);
+    while(!fr.waitingStack.empty()){
+        //find the simple path
+        Pos tmp= fr.waitingStack.top();
+        fr.waitingStack.pop();
+        dir= !dir;
+        fr.around_point(fr.floor[tmp.first][tmp.second], DOWN);
+        cout<<"queue: ";
+        fr.print_readyQueue();
+        if(!fr.readyQueue.empty()){
+            fr.update_floor();
+            cout<<"stack: ";
+            fr.print_waitingStack();
+        }
+    }
 }
