@@ -6,7 +6,7 @@ enum WAY{UP= 1, DOWN, LEFT, RIGHT};
 typedef pair<int, int> Pos;
 typedef queue<Pos> Queue;
 typedef stack<Pos> Stack;
-int row, col, Battery, dir= 0;
+int row, col, Battery, dir= 1;
 
 /*class*/
 class Point{
@@ -187,6 +187,6 @@ int main(int argc, char *argv[]){
                 R.pos= make_pair(j, i);
         }
     }
-    fr.around_point(fr.floor[1][8], DOWN);
+    fr.around_point(R, DOWN);
     fr.print_readyQueue();
 ;}
