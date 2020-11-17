@@ -2,25 +2,125 @@
 using namespace std;
 
 /*global variable*/
-typedef pair<int, int> pos;
+enum WAY{UP= 1, DOWN, LEFT, RIGHT};
+typedef pair<int, int> Pos;
+typedef queue<Pos> Queue;
+typedef stack<Pos> Stack;
 int row, col, Battery, dir= 1;
-queue<int> q;
-stack<int> s;
-pos R;
 
 /*class*/
+class Point{
+    private:
+        Pos up, down, left, right;
+    public:
+        int val;
+        Pos pos;
+        Pos get_up(){ 
+            up= make_pair(pos.first-1, pos.second);
+            return up;
+        }
+        Pos get_down(){
+            down= make_pair(pos.first+1, pos.second);
+            return down;
+        }
+        Pos get_left(){
+            left= make_pair(pos.first, pos.second-1);
+            return left;
+        }
+        Pos get_right(){
+            right= make_pair(pos.first, pos.second+1);
+            return right;
+        }
+};
+Point R;
+
 class Floor{
     private:
-        int **floor;
+        Queue readyQueue;
+        Stack waitingStack;
     public:
-        Floor(int **array): floor(array){}
+        Point **floor;
+        Floor(){
+            floor= new Point*[row];
+            for(int i= 0; i<row; i++){
+                floor[i]= new Point[col];
+                for(int j= 0; j<col; j++)
+                    floor[i][j].pos= make_pair(i, j);
+            }
+        }
         void print_floor(){
             for(int j= 0; j< row; j++){
                 for(int i= 0; i< col; i++)
-                    cout<<floor[j][i];
+                    cout<<floor[j][i].val;
                 cout<<endl;
             }
-        }         
+        }
+        void around_point(Point ptr, int way){
+            if(dir){
+                switch(way){
+                    case(UP):{
+                        if(floor[ptr.get_up().first][ptr.get_up().second].val== 0){
+                                readyQueue.push(ptr.get_up());
+                                if(floor[ptr.get_up().first][ptr.get_up().second+1].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_up().first, ptr.get_up().second+1));
+                                    around_point(ptr, RIGHT);
+                                }
+                        }
+                        else if(readyQueue.empty())
+                            around_point(ptr, RIGHT);
+                        break;
+                    }
+                    case(DOWN):{
+                        if(ptr.pos.first!= row-1){
+                            if(floor[ptr.get_down().first][ptr.get_down().second].val== 0){
+                                readyQueue.push(ptr.get_down());
+                                if(floor[ptr.get_down().first][ptr.get_down().second-1].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_down().first, ptr.get_down().second-1));
+                                    around_point(ptr, LEFT);
+                                }
+                            }
+                            else if(readyQueue.empty())
+                                around_point(ptr, LEFT);
+                        }
+                        else{
+                            around_point(ptr, LEFT);
+                        }
+                        break;
+                    }
+                    case(LEFT):{
+                        cout<<"in LEFT"<<endl;
+                        if(floor[ptr.get_left().first][ptr.get_left().second].val== 0){
+                                readyQueue.push(ptr.get_left());
+                                if(floor[ptr.get_left().first-1][ptr.get_left().second].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_left().first-1, ptr.get_left().second));
+                                    around_point(ptr, UP);
+                                }
+                        }
+                        else if(readyQueue.empty()){
+                            around_point(ptr, UP);
+                        }
+                        break;
+                    }
+                    case(RIGHT):{
+                        if(floor[ptr.get_right().first][ptr.get_right().second].val== 0){
+                                readyQueue.push(ptr.get_right());
+                                if(floor[ptr.get_right().first+1][ptr.get_right().second].val== 0){
+                                    readyQueue.push(make_pair(ptr.get_right().first+1, ptr.get_right().second));
+                                }
+                        }
+                        break;
+                    }
+                    default: break;
+                }
+            }
+        }
+        void print_readyQueue(){
+            Queue copy= readyQueue;
+            while(!copy.empty()){
+                cout<<"("<<copy.front().first<<", "<<copy.front().second<<") ";
+                copy.pop();
+            }
+        }
 };
 
 /*main function*/
@@ -33,19 +133,16 @@ int main(int argc, char *argv[]){
     ifile>> row>> col>> Battery;
 
     //initialize a floor
-    int **floor= new int*[row];
-    for(int i= 0; i<row; i++)
-        floor[i]= new int[col];
-    
+    Floor fr;
     for(int j= 0; j<row; j++){
         for(int i= 0; i<col&& !ifile.eof(); i++){
             char c;
             ifile>> c;
-            floor[j][i]= c-'0';
+            fr.floor[j][i].val= c-'0';
             if(c== 'R')
-                R= make_pair(j, i);
+                R.pos= make_pair(j, i);
         }
     }
-    Floor fr(floor);
-
+    fr.around_point(fr.floor[5][1], DOWN);
+    fr.print_readyQueue();
 ;}
