@@ -165,6 +165,9 @@ class Floor{
             }
             cout<<endl;
         }
+        void update_floor(){
+            put_queue_to_stack();
+        }
         void put_queue_to_stack(){
             while(!readyQueue.empty()){
                 waitingStack.push(readyQueue.front());
@@ -202,6 +205,5 @@ int main(int argc, char *argv[]){
         }
     }
     fr.around_point(R, DOWN);
-    fr.put_queue_to_stack();
-    fr.print_waitingStack();
+    fr.update_floor();
 }
