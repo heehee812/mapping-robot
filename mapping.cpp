@@ -201,7 +201,7 @@ int main(int argc, char *argv[]){
                 R.pos= make_pair(j, i);
         }
     }
-    fr.around_point(fr.floor[2][2], DOWN);
+    fr.around_point(R, DOWN);
     fr.put_queue_to_stack();
     fr.print_waitingStack();
 }
