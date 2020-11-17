@@ -122,8 +122,10 @@ class Floor{
                                 }
                             }
                             else{
-                                if(floor[ptr.get_left().first+1][ptr.get_left().second].val== 0){
-                                    readyQueue.push(make_pair(ptr.get_left().first+1, ptr.get_left().second));
+                                if(ptr.pos.first!= row-1){
+                                    if(floor[ptr.get_left().first+1][ptr.get_left().second].val== 0){
+                                        readyQueue.push(make_pair(ptr.get_left().first+1, ptr.get_left().second));
+                                    }
                                 }
                             }
                     }
@@ -137,8 +139,10 @@ class Floor{
                     if(floor[ptr.get_right().first][ptr.get_right().second].val== 0){
                             readyQueue.push(ptr.get_right());
                             if(dir){
-                                if(floor[ptr.get_right().first+1][ptr.get_right().second].val== 0){
+                                if(ptr.pos.first!= row-1){
+                                    if(floor[ptr.get_right().first+1][ptr.get_right().second].val== 0){
                                     readyQueue.push(make_pair(ptr.get_right().first+1, ptr.get_right().second));
+                                    }
                                 }
                             }
                             else{
