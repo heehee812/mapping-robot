@@ -12,6 +12,7 @@ class Point{
     private:
         Pos up, down, left, right;
     public:
+        int val;
         Pos pos;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
@@ -34,19 +35,25 @@ Point R;
 
 class Floor{
     private:
-        int **floor;
         Queue readyQueue;
         Stack waitingStack;
     public:
-        Floor(int **array): floor(array){}
+        Point **floor;
+        Floor(){
+            floor= new Point*[row];
+            for(int i= 0; i<row; i++)
+                floor[i]= new Point[col];
+        }
         void print_floor(){
             for(int j= 0; j< row; j++){
                 for(int i= 0; i< col; i++)
-                    cout<<floor[j][i];
+                    cout<<floor[j][i].val;
                 cout<<endl;
             }
         }
-        void around_point(Pos ptr){}
+        void around_point(Point ptr){
+            
+        }
         void print_readyQueue(){
             Queue copy= readyQueue;
             while(!copy.empty()){
@@ -66,22 +73,16 @@ int main(int argc, char *argv[]){
     ifile>> row>> col>> Battery;
 
     //initialize a floor
-    int **floor= new int*[row];
-    for(int i= 0; i<row; i++)
-        floor[i]= new int[col];
-    
+    Floor fr;
     for(int j= 0; j<row; j++){
         for(int i= 0; i<col&& !ifile.eof(); i++){
             char c;
             ifile>> c;
-            floor[j][i]= c-'0';
+            fr.floor[j][i].val= c-'0';
             if(c== 'R')
                 R.pos= make_pair(j, i);
         }
     }
-    Floor fr(floor);
     // fr.around_point(R);
-    // fr.print_readyQueue();
-    // cout<<"R= "<<R.pos.first<<", "<<R.pos.second<<endl;
-    // cout<<"R.right= "<<R.get_right().first<<", "<<R.get_right().second<<endl;
+    fr.print_floor();
 ;}
