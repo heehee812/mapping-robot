@@ -2,10 +2,11 @@
 using namespace std;
 
 /*global variable*/
+typedef pair<int, int> pos;
 int row, col, Battery, dir= 1;
 queue<int> q;
 stack<int> s;
-pair<int, int> R;
+pos R;
 
 /*class*/
 class Floor{
@@ -20,12 +21,6 @@ class Floor{
                 cout<<endl;
             }
         }         
-};
-
-class Point{
-    public:
-    int value;
-    pair<int, int> pos;
 };
 
 /*main function*/
