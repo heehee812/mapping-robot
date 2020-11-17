@@ -165,6 +165,20 @@ class Floor{
             }
             cout<<endl;
         }
+        void put_queue_to_stack(){
+            while(!readyQueue.empty()){
+                waitingStack.push(readyQueue.front());
+                readyQueue.pop();
+            }
+        }
+        void print_waitingStack(){
+            Stack copy= waitingStack;
+            while(!copy.empty()){
+                cout<<"("<<copy.top().first<<", "<<copy.top().second<<") ";
+                copy.pop();
+            }
+            cout<<endl;
+        }
 };
 
 /*main function*/
@@ -187,6 +201,7 @@ int main(int argc, char *argv[]){
                 R.pos= make_pair(j, i);
         }
     }
-    fr.around_point(R, DOWN);
-    fr.print_readyQueue();
-;}
+    fr.around_point(fr.floor[2][2], DOWN);
+    fr.put_queue_to_stack();
+    fr.print_waitingStack();
+}
