@@ -14,7 +14,7 @@ class Point{
         Pos up, down, left, right;
     public:
         int val;
-        Pos pos;
+        Pos pos, pre= pos;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
             return up;
@@ -247,19 +247,43 @@ class Floor{
             }
             return priDir;
         }
-        int walk(int i, vector<int>priDir, Pos &simple1){
+        int walk(int i, vector<int>priDir, Pos &simple2){
             int wall= 1;
             switch(priDir[i]){
                 case UP:{
+                    if(simple2.first!= 0){
+                        Pos tmp= floor[simple2.first][simple2.second].get_up();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+
+                        }
+                    }
                     break;
                 }
                 case DOWN:{
+                    if(simple2.first!= row-1){
+                        Pos tmp= floor[simple2.first][simple2.second].get_down();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+
+                        }
+                    }
                     break;
                 }
                 case LEFT:{
+                    if(simple2.first!= 0){
+                        Pos tmp= floor[simple2.first][simple2.second].get_left();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+
+                        }
+                    }
                     break;
                 }
                 case RIGHT:{
+                    if(simple2.first!= col-1){
+                        Pos tmp= floor[simple2.first][simple2.second].get_right();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+
+                        }
+                    }
                     break;
                 }
                 default: break;
