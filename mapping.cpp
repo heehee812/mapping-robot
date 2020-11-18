@@ -256,7 +256,7 @@ int main(int argc, char *argv[]){
         fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
         cout<<"Queue: ";
         fr.print_queue();
-        if(fr.readyQueue.empty()){
+        if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
             Pos simple1= tmp;
             while(fr.readyQueue.empty()){
                 tmp= fr.waitingStack.top();
