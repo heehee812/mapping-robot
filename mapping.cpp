@@ -247,6 +247,25 @@ class Floor{
             }
             return priDir;
         }
+        int walk(int i, vector<int>priDir, Pos &simple1){
+            int wall= 1;
+            switch(priDir[i]){
+                case UP:{
+                    break;
+                }
+                case DOWN:{
+                    break;
+                }
+                case LEFT:{
+                    break;
+                }
+                case RIGHT:{
+                    break;
+                }
+                default: break;
+            }
+            return wall;
+        }
 };
 
 /*main function*/
