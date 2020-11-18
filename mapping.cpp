@@ -13,7 +13,7 @@ class Point{
     private:
         Pos up, down, left, right;
     public:
-        int val;
+        int val, invalid= 0;
         Pos pos;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
@@ -246,6 +246,82 @@ class Floor{
                     priDir= {LEFT, DOWN, UP, RIGHT};
             }
             return priDir;
+        }
+        int walk(int i, vector<int>priDir, Pos &simple1, int &countstep){
+            int wall= 1;
+            Pos tmp;
+            switch(priDir[i]){
+                case UP:{
+                    if(simple1.first!= 0){
+                        tmp= floor[simple1.first][simple1.second].get_up();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case DOWN:{
+                    if(simple1.first!= row-1){
+                        tmp= floor[simple1.first][simple1.second].get_down();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case LEFT:{
+                    if(simple1.first!= 0){
+                        tmp= floor[simple1.first][simple1.second].get_left();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case RIGHT:{
+                    if(simple1.first!= col-1){
+                        tmp= floor[simple1.first][simple1.second].get_right();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
+                        }
+                    }
+                    break;
+                }
+                default: break;
+            }
+            return wall;
         }
 };
 
