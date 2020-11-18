@@ -6,7 +6,7 @@ enum WAY{UP= 1, DOWN, LEFT, RIGHT};
 typedef pair<int, int> Pos;
 typedef queue<Pos> Queue;
 typedef stack<Pos> Stack;
-int row, col, Battery;
+int row, col, Battery, Step= 0;
 
 /*class*/
 class Point{
@@ -207,6 +207,7 @@ class Floor{
                 Pos tmp= readyQueue.front();
                 readyQueue.pop();
                 floor[tmp.first][tmp.second].val= 2;
+                Step++;
                 waitingStack.push(tmp);
             }
         }
