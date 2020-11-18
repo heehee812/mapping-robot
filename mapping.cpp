@@ -208,6 +208,7 @@ class Floor{
                 readyQueue.pop();
                 floor[tmp.first][tmp.second].val= 2;
                 Step++;
+                cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
                 waitingStack.push(tmp);
             }
         }
@@ -230,7 +231,6 @@ class Floor{
                 // cout<<endl;
                 int i= 0;
                 while(walk(priDir[i], simple1, countstep)&&i<4){
-                    cout<<"i: "<<i<<endl;
                     i++;
                 }
             }
@@ -379,7 +379,7 @@ int main(int argc, char *argv[]){
     while(!fr.waitingStack.empty()){
         //find the simple path
         Pos tmp= fr.waitingStack.top();
-        cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
+        // cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
         fr.waitingStack.pop();
         fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
         cout<<"Queue: ";
@@ -391,10 +391,7 @@ int main(int argc, char *argv[]){
                 fr.waitingStack.pop();
                 fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
             }
-            cout<<"simple1: "<<simple1.first<<", "<<simple1.second<<endl;
-            cout<<"simple2: "<<tmp.first<<", "<<tmp.second<<endl;
             Step+=fr.simple_path(simple1, tmp);
-            cout<<"ssStep: "<<Step<<endl;
         }
         fr.update_floor();
         cout<<"Stack: ";
