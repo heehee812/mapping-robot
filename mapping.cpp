@@ -235,6 +235,7 @@ class Floor{
                 }
             }
             // cout<<"coutstep= "<<countstep<<endl;
+            initialize_simple_path();
             return countstep;
         }
         vector<int> priority_queue(Pos simple1, Pos simple2){
@@ -350,6 +351,13 @@ class Floor{
                 default: break;
             }
             return wall;
+        }
+        void initialize_simple_path(){
+            for(int i= 0; i<row; i++){
+                for(int j= 0; j<col; j++){
+                    floor[i][j].invalid= 0;
+                }
+            }
         }
 };
 
