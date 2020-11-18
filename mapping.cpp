@@ -228,6 +228,8 @@ class Floor{
                     i++;
                 }
             }
+            // cout<<"coutstep= "<<countstep<<endl;
+            return countstep;
         }
         vector<int> priority_queue(Pos simple1, Pos simple2){
             vector<int> priDir;
@@ -362,34 +364,5 @@ int main(int argc, char *argv[]){
         }
     }
 
-    //trace the floor
-    fr.waitingStack.push(R.pos);
-    while(!fr.waitingStack.empty()){
-        //find the simple path
-        Pos tmp= fr.waitingStack.top();
-        fr.waitingStack.pop();
-        fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-        if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
-            Pos simple1= tmp;
-            while(fr.readyQueue.empty()){
-                tmp= fr.waitingStack.top();
-                fr.waitingStack.pop();
-                fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-            }
-            Step+=fr.simple_path(simple1, tmp);
-        }
-        fr.update_floor();
-    }
-
-    //test
-    // vector<int> priDir;
-    // int countstep= 0;
-    // Pos simple1= make_pair(2, 2), simple2= make_pair(4, 2);
-    // priDir= fr.priority_queue(simple1, simple2);
-    // int wall= fr.walk(priDir[0], simple1, countstep);
-    // cout<<"priDir: ";
-    // for(auto i: priDir)
-    //     cout<<i<<", ";
-    // cout<<endl;
-    // cout<<"wall= "<<wall<<", simple1= ("<<simple1.first<<", "<<simple1.second<<")"<<endl;
+    // cout<<"Step: "<< fr.simple_path(make_pair(2, 0), make_pair(5, 1))<<endl;
 }
