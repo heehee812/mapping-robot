@@ -219,7 +219,15 @@ class Floor{
             cout<<endl;
         }
         int simple_path(Pos simple1, Pos simple2){
-            return 5;
+            int countstep= 0;
+            Pos simple1Pre= simple1;
+            while(simple1!= simple2){
+                vector<int> priDir= priority_queue(simple1, simple2);
+                int i= 0;
+                while(walk(priDir[i], simple1, simple1Pre, countstep)&&i<4){
+                    i++;
+                }
+            }
         }
         vector<int> priority_queue(Pos simple1, Pos simple2){
             vector<int> priDir;
@@ -247,7 +255,7 @@ class Floor{
             }
             return priDir;
         }
-        int walk(int i, Pos &simple1, int &countstep){
+        int walk(int i, Pos &simple1, Pos &simple1Pre, int &countstep){
             int wall= 1;
             Pos tmp;
             switch(i){
@@ -255,14 +263,16 @@ class Floor{
                     if(simple1.first!= 0){
                         tmp= floor[simple1.first][simple1.second].get_up();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1){
+                            if(tmp!= simple1Pre){
                                 wall= 0;
                                 countstep++;
+                                simple1Pre= simple1;
                                 simple1= tmp;
                             }
                             else{
                                 countstep--;
                                 floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
                             }
                         }
                     }
@@ -272,14 +282,16 @@ class Floor{
                     if(simple1.first!= row-1){
                         tmp= floor[simple1.first][simple1.second].get_down();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1){
+                            if(tmp!= simple1Pre){
                                 wall= 0;
                                 countstep++;
+                                simple1Pre= simple1;
                                 simple1= tmp;
                             }
                             else{
                                 countstep--;
                                 floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
                             }
                         }
                     }
@@ -289,14 +301,16 @@ class Floor{
                     if(simple1.first!= 0){
                         tmp= floor[simple1.first][simple1.second].get_left();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1){
+                            if(tmp!= simple1Pre){
                                 wall= 0;
                                 countstep++;
+                                simple1Pre= simple1;
                                 simple1= tmp;
                             }
                             else{
                                 countstep--;
                                 floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
                             }
                         }
                     }
@@ -306,14 +320,16 @@ class Floor{
                     if(simple1.first!= col-1){
                         tmp= floor[simple1.first][simple1.second].get_right();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1){
+                            if(tmp!= simple1Pre){
                                 wall= 0;
                                 countstep++;
+                                simple1Pre= simple1;
                                 simple1= tmp;
                             }
                             else{
                                 countstep--;
                                 floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
                             }
                         }
                     }
