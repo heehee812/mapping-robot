@@ -197,7 +197,6 @@ class Floor{
         void print_queue(){
             Queue copy= readyQueue;
             while(!copy.empty()){
-                cout<<"("<<copy.front().first<<", "<<copy.front().second<<") ";
                 copy.pop();
             }
             cout<<endl;
@@ -209,7 +208,6 @@ class Floor{
                 floor[tmp.first][tmp.second].val= 2;
                 Step++;
                 waitingStack.push(tmp);
-                cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
             }
         }
         void print_waitingStack(){
@@ -222,6 +220,32 @@ class Floor{
         }
         int simple_path(Pos simple1, Pos simple2){
             return 5;
+        }
+        vector<int> priority_queue(Pos simple1, Pos simple2){
+            vector<int> priDir;
+            if(simple1.first>simple2.first){//up
+                if(simple1.second<simple2.second)//right
+                    priDir= {RIGHT, UP, LEFT, DOWN};
+                else if(simple1.second>simple2.second)//left
+                    priDir= {LEFT, UP, RIGHT, DOWN};
+                else
+                    priDir= {UP, RIGHT, LEFT, DOWN};
+            }
+            else if(simple1.first<simple2.first){//down
+                if(simple1.second<simple2.second)//right
+                    priDir= {RIGHT, DOWN, LEFT, UP};
+                else if(simple1.second>simple2.second)//left
+                    priDir= {LEFT, DOWN, RIGHT, UP};
+                else
+                    priDir= {DOWN, RIGHT, LEFT, UP};
+            }
+            else{//equal
+                if(simple1.second<simple2.second)//right
+                    priDir= {RIGHT, DOWN, UP, LEFT};
+                else if(simple1.second>simple2.second)//left
+                    priDir= {LEFT, DOWN, UP, RIGHT};
+            }
+            return priDir;
         }
 };
 
@@ -251,11 +275,8 @@ int main(int argc, char *argv[]){
     while(!fr.waitingStack.empty()){
         //find the simple path
         Pos tmp= fr.waitingStack.top();
-        cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
         fr.waitingStack.pop();
         fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-        cout<<"Queue: ";
-        fr.print_queue();
         if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
             Pos simple1= tmp;
             while(fr.readyQueue.empty()){
@@ -266,8 +287,5 @@ int main(int argc, char *argv[]){
             Step+=fr.simple_path(simple1, tmp);
         }
         fr.update_floor();
-        cout<<"Stack: ";
-        fr.print_waitingStack();
     }
-    fr.print_floor();
 }
