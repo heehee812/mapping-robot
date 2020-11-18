@@ -6,14 +6,14 @@ enum WAY{UP= 1, DOWN, LEFT, RIGHT};
 typedef pair<int, int> Pos;
 typedef queue<Pos> Queue;
 typedef stack<Pos> Stack;
-int row, col, Battery;
+int row, col, Battery, Step= 0;
 
 /*class*/
 class Point{
     private:
         Pos up, down, left, right;
     public:
-        int val;
+        int val, invalid= 0;
         Pos pos;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
@@ -197,7 +197,6 @@ class Floor{
         void print_queue(){
             Queue copy= readyQueue;
             while(!copy.empty()){
-                cout<<"("<<copy.front().first<<", "<<copy.front().second<<") ";
                 copy.pop();
             }
             cout<<endl;
@@ -207,6 +206,7 @@ class Floor{
                 Pos tmp= readyQueue.front();
                 readyQueue.pop();
                 floor[tmp.first][tmp.second].val= 2;
+                Step++;
                 waitingStack.push(tmp);
             }
         }
@@ -217,6 +217,129 @@ class Floor{
                 copy.pop();
             }
             cout<<endl;
+        }
+        int simple_path(Pos simple1, Pos simple2){
+            int countstep= 0;
+            Pos simple1Pre= simple1;
+            while(simple1!= simple2){
+                vector<int> priDir= priority_queue(simple1, simple2);
+                int i= 0;
+                while(walk(priDir[i], simple1, simple1Pre, countstep)&&i<4){
+                    i++;
+                }
+            }
+            // cout<<"coutstep= "<<countstep<<endl;
+            return countstep;
+        }
+        vector<int> priority_queue(Pos simple1, Pos simple2){
+            vector<int> priDir;
+            if(simple1.first>simple2.first){//up
+                if(simple1.second<simple2.second)//right
+                    priDir= {RIGHT, UP, LEFT, DOWN};
+                else if(simple1.second>simple2.second)//left
+                    priDir= {LEFT, UP, RIGHT, DOWN};
+                else
+                    priDir= {UP, RIGHT, LEFT, DOWN};
+            }
+            else if(simple1.first<simple2.first){//down
+                if(simple1.second<simple2.second)//right
+                    priDir= {RIGHT, DOWN, LEFT, UP};
+                else if(simple1.second>simple2.second)//left
+                    priDir= {LEFT, DOWN, RIGHT, UP};
+                else
+                    priDir= {DOWN, RIGHT, LEFT, UP};
+            }
+            else{//equal
+                if(simple1.second<simple2.second)//right
+                    priDir= {RIGHT, DOWN, UP, LEFT};
+                else if(simple1.second>simple2.second)//left
+                    priDir= {LEFT, DOWN, UP, RIGHT};
+            }
+            return priDir;
+        }
+        int walk(int i, Pos &simple1, Pos &simple1Pre, int &countstep){
+            int wall= 1;
+            Pos tmp;
+            switch(i){
+                case UP:{
+                    if(simple1.first!= 0){
+                        tmp= floor[simple1.first][simple1.second].get_up();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1Pre){
+                                wall= 0;
+                                countstep++;
+                                simple1Pre= simple1;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case DOWN:{
+                    if(simple1.first!= row-1){
+                        tmp= floor[simple1.first][simple1.second].get_down();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1Pre){
+                                wall= 0;
+                                countstep++;
+                                simple1Pre= simple1;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case LEFT:{
+                    if(simple1.first!= 0){
+                        tmp= floor[simple1.first][simple1.second].get_left();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1Pre){
+                                wall= 0;
+                                countstep++;
+                                simple1Pre= simple1;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case RIGHT:{
+                    if(simple1.first!= col-1){
+                        tmp= floor[simple1.first][simple1.second].get_right();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1Pre){
+                                wall= 0;
+                                countstep++;
+                                simple1Pre= simple1;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                                simple1= simple1Pre;
+                            }
+                        }
+                    }
+                    break;
+                }
+                default: break;
+            }
+            return wall;
         }
 };
 
@@ -241,20 +364,5 @@ int main(int argc, char *argv[]){
         }
     }
 
-    //trace the floor
-    fr.waitingStack.push(R.pos);
-    while(!fr.waitingStack.empty()){
-        //find the simple path
-        Pos tmp= fr.waitingStack.top();
-        fr.waitingStack.pop();
-        fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-        cout<<"queue: ";
-        fr.print_queue();
-        if(!fr.readyQueue.empty()){
-            fr.update_floor();
-            cout<<"stack: ";
-            fr.print_waitingStack();
-        }
-    }
-    fr.print_floor();
+    // cout<<"Step: "<< fr.simple_path(make_pair(2, 0), make_pair(5, 1))<<endl;
 }
