@@ -364,5 +364,22 @@ int main(int argc, char *argv[]){
         }
     }
 
+    //trace the floor
+    fr.waitingStack.push(R.pos);
+    while(!fr.waitingStack.empty()){
+        //find the simple path
+        Pos tmp= fr.waitingStack.top();
+        fr.waitingStack.pop();
+        fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
+        cout<<"queue: ";
+        fr.print_queue();
+        if(!fr.readyQueue.empty()){
+            fr.update_floor();
+            cout<<"stack: ";
+            fr.print_waitingStack();
+        }
+    }
+    fr.print_floor();
+
     // cout<<"Step: "<< fr.simple_path(make_pair(2, 0), make_pair(5, 1))<<endl;
 }
