@@ -14,7 +14,7 @@ class Point{
         Pos up, down, left, right;
     public:
         int val, invalid= 0;
-        Pos pos;
+        Pos pos, pre;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
             return up;
@@ -197,6 +197,7 @@ class Floor{
         void print_queue(){
             Queue copy= readyQueue;
             while(!copy.empty()){
+                cout<<"("<<copy.front().first<<", "<<copy.front().second<<")";
                 copy.pop();
             }
             cout<<endl;
@@ -220,11 +221,16 @@ class Floor{
         }
         int simple_path(Pos simple1, Pos simple2){
             int countstep= 0;
-            Pos simple1Pre= simple1;
+            floor[simple1.first][simple1.second].pre= simple1;
+            // Pos simple1Pre= simple1;
             while(simple1!= simple2){
                 vector<int> priDir= priority_queue(simple1, simple2);
+                // for(auto i: priDir)
+                //     cout<<i<<" ";
+                // cout<<endl;
                 int i= 0;
-                while(walk(priDir[i], simple1, simple1Pre, countstep)&&i<4){
+                while(walk(priDir[i], simple1, countstep)&&i<4){
+                    cout<<"i: "<<i<<endl;
                     i++;
                 }
             }
@@ -257,7 +263,7 @@ class Floor{
             }
             return priDir;
         }
-        int walk(int i, Pos &simple1, Pos &simple1Pre, int &countstep){
+        int walk(int i, Pos &simple1, int &countstep){
             int wall= 1;
             Pos tmp;
             switch(i){
@@ -265,16 +271,17 @@ class Floor{
                     if(simple1.first!= 0){
                         tmp= floor[simple1.first][simple1.second].get_up();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1Pre){
+                            if(tmp!= floor[simple1.first][simple1.second].pre){
                                 wall= 0;
                                 countstep++;
-                                simple1Pre= simple1;
+                                floor[tmp.first][tmp.second].pre= simple1;
                                 simple1= tmp;
                             }
                             else{
+                                simple1= tmp;
                                 countstep--;
+                                tmp= floor[simple1.first][simple1.second].get_left();
                                 floor[tmp.first][tmp.second].invalid= 1;
-                                simple1= simple1Pre;
                             }
                         }
                     }
@@ -284,16 +291,17 @@ class Floor{
                     if(simple1.first!= row-1){
                         tmp= floor[simple1.first][simple1.second].get_down();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1Pre){
+                            if(tmp!= floor[simple1.first][simple1.second].pre){
                                 wall= 0;
                                 countstep++;
-                                simple1Pre= simple1;
+                                floor[tmp.first][tmp.second].pre= simple1;
                                 simple1= tmp;
                             }
                             else{
+                                simple1= tmp;
                                 countstep--;
+                                tmp= floor[simple1.first][simple1.second].get_left();
                                 floor[tmp.first][tmp.second].invalid= 1;
-                                simple1= simple1Pre;
                             }
                         }
                     }
@@ -303,16 +311,17 @@ class Floor{
                     if(simple1.first!= 0){
                         tmp= floor[simple1.first][simple1.second].get_left();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1Pre){
+                            if(tmp!= floor[simple1.first][simple1.second].pre){
                                 wall= 0;
                                 countstep++;
-                                simple1Pre= simple1;
+                                floor[tmp.first][tmp.second].pre= simple1;
                                 simple1= tmp;
                             }
                             else{
+                                simple1= tmp;
                                 countstep--;
+                                tmp= floor[simple1.first][simple1.second].get_left();
                                 floor[tmp.first][tmp.second].invalid= 1;
-                                simple1= simple1Pre;
                             }
                         }
                     }
@@ -322,16 +331,17 @@ class Floor{
                     if(simple1.first!= col-1){
                         tmp= floor[simple1.first][simple1.second].get_right();
                         if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= simple1Pre){
+                            if(tmp!= floor[simple1.first][simple1.second].pre){
                                 wall= 0;
                                 countstep++;
-                                simple1Pre= simple1;
+                                floor[tmp.first][tmp.second].pre= simple1;
                                 simple1= tmp;
                             }
                             else{
+                                simple1= tmp;
                                 countstep--;
+                                tmp= floor[simple1.first][simple1.second].get_left();
                                 floor[tmp.first][tmp.second].invalid= 1;
-                                simple1= simple1Pre;
                             }
                         }
                     }
@@ -369,17 +379,26 @@ int main(int argc, char *argv[]){
     while(!fr.waitingStack.empty()){
         //find the simple path
         Pos tmp= fr.waitingStack.top();
+        cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
         fr.waitingStack.pop();
         fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-        cout<<"queue: ";
+        cout<<"Queue: ";
         fr.print_queue();
-        if(!fr.readyQueue.empty()){
-            fr.update_floor();
-            cout<<"stack: ";
-            fr.print_waitingStack();
+        if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
+            Pos simple1= tmp;
+            while(fr.readyQueue.empty()){
+                tmp= fr.waitingStack.top();
+                fr.waitingStack.pop();
+                fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
+            }
+            cout<<"simple1: "<<simple1.first<<", "<<simple1.second<<endl;
+            cout<<"simple2: "<<tmp.first<<", "<<tmp.second<<endl;
+            Step+=fr.simple_path(simple1, tmp);
+            cout<<"ssStep: "<<Step<<endl;
         }
+        fr.update_floor();
+        cout<<"Stack: ";
+        fr.print_waitingStack();
     }
     fr.print_floor();
-
-    // cout<<"Step: "<< fr.simple_path(make_pair(2, 0), make_pair(5, 1))<<endl;
 }
