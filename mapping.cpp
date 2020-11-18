@@ -247,10 +247,10 @@ class Floor{
             }
             return priDir;
         }
-        int walk(int i, vector<int>priDir, Pos &simple1, int &countstep){
+        int walk(int i, Pos &simple1, int &countstep){
             int wall= 1;
             Pos tmp;
-            switch(priDir[i]){
+            switch(i){
                 case UP:{
                     if(simple1.first!= 0){
                         tmp= floor[simple1.first][simple1.second].get_up();
@@ -364,4 +364,16 @@ int main(int argc, char *argv[]){
         }
         fr.update_floor();
     }
+
+    //test
+    // vector<int> priDir;
+    // int countstep= 0;
+    // Pos simple1= make_pair(2, 2), simple2= make_pair(4, 2);
+    // priDir= fr.priority_queue(simple1, simple2);
+    // int wall= fr.walk(priDir[0], simple1, countstep);
+    // cout<<"priDir: ";
+    // for(auto i: priDir)
+    //     cout<<i<<", ";
+    // cout<<endl;
+    // cout<<"wall= "<<wall<<", simple1= ("<<simple1.first<<", "<<simple1.second<<")"<<endl;
 }
