@@ -13,8 +13,8 @@ class Point{
     private:
         Pos up, down, left, right;
     public:
-        int val;
-        Pos pos, pre= pos;
+        int val, invalid= 0;
+        Pos pos;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
             return up;
@@ -247,41 +247,74 @@ class Floor{
             }
             return priDir;
         }
-        int walk(int i, vector<int>priDir, Pos &simple2){
+        int walk(int i, vector<int>priDir, Pos &simple1, int &countstep){
             int wall= 1;
+            Pos tmp;
             switch(priDir[i]){
                 case UP:{
-                    if(simple2.first!= 0){
-                        Pos tmp= floor[simple2.first][simple2.second].get_up();
-                        if(floor[tmp.first][tmp.second].val!= 1){
-
+                    if(simple1.first!= 0){
+                        tmp= floor[simple1.first][simple1.second].get_up();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
                         }
                     }
                     break;
                 }
                 case DOWN:{
-                    if(simple2.first!= row-1){
-                        Pos tmp= floor[simple2.first][simple2.second].get_down();
-                        if(floor[tmp.first][tmp.second].val!= 1){
-
+                    if(simple1.first!= row-1){
+                        tmp= floor[simple1.first][simple1.second].get_down();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
                         }
                     }
                     break;
                 }
                 case LEFT:{
-                    if(simple2.first!= 0){
-                        Pos tmp= floor[simple2.first][simple2.second].get_left();
-                        if(floor[tmp.first][tmp.second].val!= 1){
-
+                    if(simple1.first!= 0){
+                        tmp= floor[simple1.first][simple1.second].get_left();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
                         }
                     }
                     break;
                 }
                 case RIGHT:{
-                    if(simple2.first!= col-1){
-                        Pos tmp= floor[simple2.first][simple2.second].get_right();
-                        if(floor[tmp.first][tmp.second].val!= 1){
-
+                    if(simple1.first!= col-1){
+                        tmp= floor[simple1.first][simple1.second].get_right();
+                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
+                            if(tmp!= simple1){
+                                wall= 0;
+                                countstep++;
+                                simple1= tmp;
+                            }
+                            else{
+                                countstep--;
+                                floor[tmp.first][tmp.second].invalid= 1;
+                            }
                         }
                     }
                     break;
