@@ -251,10 +251,15 @@ class Floor{
                 cout<<"simplenext= "<<simplenext.first<<simplenext.second<<endl;
                 vector<int>priDir= priority_queue(simple1, simple2);
                 simple1= simplenext;
-                while(simplenext==simple1){
+                while(simplenext==simple1&&!overlay){
+                    cout<<"i: "<<i<<endl;
                     if(i<priDir.size()){
                         simplenext= get_dir(priDir[i], simple1, overlay, over, countstep);
                         i++;
+                    }
+                    else{
+                        overlay= 1;
+                        countstep--;
                     }
                 }
                 cout<<"simplenext= "<<simplenext.first<<simplenext.second<<endl;
@@ -287,40 +292,115 @@ class Floor{
             cout<<"way= "<<way<<endl;
             switch(way){
                 case(UP):{
-                    tmp= floor[simplenext.first][simplenext.second].get_up();
+                    if(simplenext.first>0){
+                        tmp= floor[simplenext.first][simplenext.second].get_up();
+                        cout<<"tmp= "<<tmp.first<<", "<<tmp.second<<", "<<floor[tmp.first][tmp.second].val<<endl;
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            cout<<"can go"<<endl;
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                cout<<"overlay"<<endl;
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            cout<<"countstep= "<<countstep<<endl;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
                     break;
                 }
                 case(DOWN):{
-                    tmp= floor[simplenext.first][simplenext.second].get_down();
+                    if(simplenext.first<row-1){
+                        tmp= floor[simplenext.first][simplenext.second].get_down();
+                        cout<<"tmp= "<<tmp.first<<", "<<tmp.second<<", "<<floor[tmp.first][tmp.second].val<<endl;
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            cout<<"can go"<<endl;
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                cout<<"overlay"<<endl;
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            cout<<"countstep= "<<countstep<<endl;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
                     break;
                 }
                 case(LEFT):{
-                    tmp= floor[simplenext.first][simplenext.second].get_left();
+                    if(simplenext.second>0){
+                        tmp= floor[simplenext.first][simplenext.second].get_left();
+                        cout<<"tmp= "<<tmp.first<<", "<<tmp.second<<", "<<floor[tmp.first][tmp.second].val<<endl;
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            cout<<"can go"<<endl;
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                cout<<"overlay"<<endl;
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            cout<<"countstep= "<<countstep<<endl;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
                     break;
                 }
                 case(RIGHT):{
-                    tmp= floor[simplenext.first][simplenext.second].get_right();
+                    if(simplenext.second<col-1){
+                        tmp= floor[simplenext.first][simplenext.second].get_right();
+                        cout<<"tmp= "<<tmp.first<<", "<<tmp.second<<", "<<floor[tmp.first][tmp.second].val<<endl;
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            cout<<"can go"<<endl;
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                cout<<"overlay"<<endl;
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            cout<<"countstep= "<<countstep<<endl;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
                     break;
                 }
             }
-            cout<<"tmp= "<<tmp.first<<", "<<tmp.second<<", "<<floor[tmp.first][tmp.second].val<<endl;
-            if(floor[tmp.first][tmp.second].val!= 1){
-                cout<<"can go"<<endl;
-                if(floor[simplenext.first][simplenext.second].pre==tmp){
-                    cout<<"overlay"<<endl;
-                    overlay= 1;
-                    over= tmp;
-                    countstep--;
-                }
-                else
-                    countstep++;
-                floor[tmp.first][tmp.second].pre= simplenext;
-                cout<<"countstep= "<<countstep<<endl;
-                return tmp;
-            }
-            else{
-                return simplenext;
-            }
+            return tmp;
         }
         
         vector<int> priority_queue(Pos simple1, Pos simple2){
@@ -330,11 +410,11 @@ class Floor{
             if(simple1.first>simple2.first){//up
                 if(simple1.second<simple2.second){//right
                     if(tmp== s1.get_up())
-                        priDir= {RIGHT, LEFT, DOWN};
+                        priDir= {RIGHT, LEFT, DOWN, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {RIGHT, UP, LEFT};
+                        priDir= {RIGHT, UP, LEFT, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {RIGHT, UP, DOWN};
+                        priDir= {RIGHT, UP, DOWN,};
                     else if(tmp== s1.get_right())
                         priDir= {UP, LEFT, DOWN};
                     else
@@ -342,11 +422,11 @@ class Floor{
                 }
                 else if(simple1.second>simple2.second){//left
                     if(tmp== s1.get_up())
-                        priDir= {LEFT, RIGHT, DOWN};
+                        priDir= {LEFT, RIGHT, DOWN, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {LEFT, UP, RIGHT};
+                        priDir= {LEFT, UP, RIGHT, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {UP, RIGHT, DOWN};
+                        priDir= {UP, RIGHT, DOWN,};
                     else if(tmp== s1.get_right())
                         priDir= {LEFT, UP, DOWN};
                     else
@@ -354,11 +434,11 @@ class Floor{
                 }
                 else{
                     if(tmp== s1.get_up())
-                        priDir= {RIGHT, LEFT, DOWN};
+                        priDir= {RIGHT, LEFT, DOWN, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {UP, RIGHT, LEFT};
+                        priDir= {UP, RIGHT, LEFT, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {UP, RIGHT, DOWN};
+                        priDir= {UP, RIGHT, DOWN,};
                     else if(tmp== s1.get_right())
                         priDir= {UP, LEFT, DOWN};
                     else
@@ -368,11 +448,11 @@ class Floor{
             else if(simple1.first<simple2.first){//down
                 if(simple1.second<simple2.second){//right
                     if(tmp== s1.get_up())
-                        priDir= {RIGHT, DOWN, LEFT};
+                        priDir= {RIGHT, DOWN, LEFT, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {RIGHT, LEFT, UP};
+                        priDir= {RIGHT, LEFT, UP, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {RIGHT, DOWN, UP};
+                        priDir= {RIGHT, DOWN, UP,};
                     else if(tmp== s1.get_right())
                         priDir= {DOWN, LEFT, UP};
                     else
@@ -380,11 +460,11 @@ class Floor{
                 }
                 else if(simple1.second>simple2.second){//left
                     if(tmp== s1.get_up())
-                        priDir= {LEFT, DOWN, RIGHT};
+                        priDir= {LEFT, DOWN, RIGHT, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {LEFT, RIGHT, UP};
+                        priDir= {LEFT, RIGHT, UP, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {DOWN, RIGHT, UP};
+                        priDir= {DOWN, RIGHT, UP,};
                     else if(tmp== s1.get_right())
                         priDir= {LEFT, DOWN, UP};
                     else
@@ -392,11 +472,11 @@ class Floor{
                 }
                 else{
                     if(tmp== s1.get_up())
-                        priDir= {DOWN, RIGHT, LEFT};
+                        priDir= {DOWN, RIGHT, LEFT, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {RIGHT, LEFT, UP};
+                        priDir= {RIGHT, LEFT, UP, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {DOWN, RIGHT, UP};
+                        priDir= {DOWN, RIGHT, UP,};
                     else if(tmp== s1.get_right())
                         priDir= {DOWN, LEFT, UP};
                     else
@@ -406,11 +486,11 @@ class Floor{
             else{//equal
                 if(simple1.second<simple2.second){//right
                     if(tmp== s1.get_up())
-                        priDir= {RIGHT, DOWN, LEFT};
+                        priDir= {RIGHT, DOWN, LEFT, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {RIGHT, UP, LEFT};
+                        priDir= {RIGHT, UP, LEFT, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {RIGHT, DOWN, UP};
+                        priDir= {RIGHT, DOWN, UP,};
                     else if(tmp== s1.get_right())
                         priDir= {DOWN, UP, LEFT};
                     else
@@ -418,11 +498,11 @@ class Floor{
                 }
                 else if(simple1.second>simple2.second){//left
                     if(tmp== s1.get_up())
-                        priDir= {LEFT, DOWN, RIGHT};
+                        priDir= {LEFT, DOWN, RIGHT, UP};
                     else if(tmp== s1.get_down())
-                        priDir= {LEFT, UP, RIGHT};
+                        priDir= {LEFT, UP, RIGHT, DOWN};
                     else if(tmp== s1.get_left())
-                        priDir= {DOWN, UP, RIGHT};
+                        priDir= {DOWN, UP, RIGHT,};
                     else if(tmp== s1.get_right())
                         priDir= {LEFT, DOWN, UP};
                     else
@@ -495,6 +575,6 @@ int main(int argc, char *argv[]){
     //     }
     // }
     // fr.print_floor();
-    int kk=fr.simple_path(make_pair(5, 8), make_pair(5, 6));
+    int kk=fr.simple_path(make_pair(6, 1), make_pair(6, 4));
     cout<<"kk: "<<kk<<endl;
 }
