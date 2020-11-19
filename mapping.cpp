@@ -252,7 +252,7 @@ class Floor{
                 vector<int>priDir= priority_queue(simple1, simple2);
                 simple1= simplenext;
                 while(simplenext==simple1){
-                    if(i<4){
+                    if(i<priDir.size()){
                         simplenext= get_dir(priDir[i], simple1, overlay, over, countstep);
                         i++;
                     }
@@ -325,27 +325,109 @@ class Floor{
         
         vector<int> priority_queue(Pos simple1, Pos simple2){
             vector<int> priDir;
+            Pos tmp= floor[simple1.first][simple1.second].pre;
+            Point s1= floor[simple1.first][simple1.second];
             if(simple1.first>simple2.first){//up
-                if(simple1.second<simple2.second)//right
-                    priDir= {RIGHT, UP, LEFT, DOWN};
-                else if(simple1.second>simple2.second)//left
-                    priDir= {LEFT, UP, RIGHT, DOWN};
-                else
-                    priDir= {UP, RIGHT, LEFT, DOWN};
+                if(simple1.second<simple2.second){//right
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, LEFT, DOWN};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, UP, LEFT};
+                    else if(tmp== s1.get_left())
+                        priDir= {RIGHT, UP, DOWN};
+                    else if(tmp== s1.get_right())
+                        priDir= {UP, LEFT, DOWN};
+                    else
+                        priDir= {RIGHT, UP, LEFT, DOWN};
+                }
+                else if(simple1.second>simple2.second){//left
+                    if(tmp== s1.get_up())
+                        priDir= {LEFT, RIGHT, DOWN};
+                    else if(tmp== s1.get_down())
+                        priDir= {LEFT, UP, RIGHT};
+                    else if(tmp== s1.get_left())
+                        priDir= {UP, RIGHT, DOWN};
+                    else if(tmp== s1.get_right())
+                        priDir= {LEFT, UP, DOWN};
+                    else
+                        priDir= {LEFT, UP, RIGHT, DOWN};
+                }
+                else{
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, LEFT, DOWN};
+                    else if(tmp== s1.get_down())
+                        priDir= {UP, RIGHT, LEFT};
+                    else if(tmp== s1.get_left())
+                        priDir= {UP, RIGHT, DOWN};
+                    else if(tmp== s1.get_right())
+                        priDir= {UP, LEFT, DOWN};
+                    else
+                        priDir= {UP, RIGHT, LEFT, DOWN};
+                }
             }
             else if(simple1.first<simple2.first){//down
-                if(simple1.second<simple2.second)//right
-                    priDir= {RIGHT, DOWN, LEFT, UP};
-                else if(simple1.second>simple2.second)//left
-                    priDir= {LEFT, DOWN, RIGHT, UP};
-                else
-                    priDir= {DOWN, RIGHT, LEFT, UP};
+                if(simple1.second<simple2.second){//right
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, DOWN, LEFT};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, LEFT, UP};
+                    else if(tmp== s1.get_left())
+                        priDir= {RIGHT, DOWN, UP};
+                    else if(tmp== s1.get_right())
+                        priDir= {DOWN, LEFT, UP};
+                    else
+                        priDir= {RIGHT, DOWN, LEFT, UP};
+                }
+                else if(simple1.second>simple2.second){//left
+                    if(tmp== s1.get_up())
+                        priDir= {LEFT, DOWN, RIGHT};
+                    else if(tmp== s1.get_down())
+                        priDir= {LEFT, RIGHT, UP};
+                    else if(tmp== s1.get_left())
+                        priDir= {DOWN, RIGHT, UP};
+                    else if(tmp== s1.get_right())
+                        priDir= {LEFT, DOWN, UP};
+                    else
+                        priDir= {LEFT, DOWN, RIGHT, UP};
+                }
+                else{
+                    if(tmp== s1.get_up())
+                        priDir= {DOWN, RIGHT, LEFT};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, LEFT, UP};
+                    else if(tmp== s1.get_left())
+                        priDir= {DOWN, RIGHT, UP};
+                    else if(tmp== s1.get_right())
+                        priDir= {DOWN, LEFT, UP};
+                    else
+                        priDir= {DOWN, RIGHT, LEFT, UP};
+                }
             }
             else{//equal
-                if(simple1.second<simple2.second)//right
-                    priDir= {RIGHT, DOWN, UP, LEFT};
-                else if(simple1.second>simple2.second)//left
-                    priDir= {LEFT, DOWN, UP, RIGHT};
+                if(simple1.second<simple2.second){//right
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, DOWN, LEFT};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, UP, LEFT};
+                    else if(tmp== s1.get_left())
+                        priDir= {RIGHT, DOWN, UP};
+                    else if(tmp== s1.get_right())
+                        priDir= {DOWN, UP, LEFT};
+                    else
+                        priDir= {RIGHT, DOWN, UP, LEFT};
+                }
+                else if(simple1.second>simple2.second){//left
+                    if(tmp== s1.get_up())
+                        priDir= {LEFT, DOWN, RIGHT};
+                    else if(tmp== s1.get_down())
+                        priDir= {LEFT, UP, RIGHT};
+                    else if(tmp== s1.get_left())
+                        priDir= {DOWN, UP, RIGHT};
+                    else if(tmp== s1.get_right())
+                        priDir= {LEFT, DOWN, UP};
+                    else
+                        priDir= {LEFT, DOWN, UP, RIGHT};
+                }
             }
             return priDir;
         }
@@ -413,6 +495,6 @@ int main(int argc, char *argv[]){
     //     }
     // }
     // fr.print_floor();
-    int kk=fr.simple_path(make_pair(4,2), make_pair(1, 1));
+    int kk=fr.simple_path(make_pair(5, 8), make_pair(5, 6));
     cout<<"kk: "<<kk<<endl;
 }
