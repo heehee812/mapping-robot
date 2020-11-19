@@ -240,61 +240,42 @@ class Floor{
             cout<<endl;
         }
         int simple_path(Pos simple1, Pos simple2){
-            static int step= 0;
+            static int countstep= 0;
+            static bool overlay= 0;
+            static Pos over= simple1;
+            int step= 0;
             Pos simplenext= simple1;
-            cout<<"simplenext: "<<simplenext.first<<simplenext.second<<endl;
-            static int overlay= 0;
             int i= 0;
-            vector<int> priDir= priority_queue(simple1, simple2);
-            for(auto i: priDir)
-                cout<<i<<" ";
-            cout<<endl;
-            while(simple1== simplenext){
-                cout<<"simple1= simplenext"<<endl;
-                if(i<4){
-                    cout<<"i: "<<i<<endl;
-                    simplenext= get_dir(priDir[i], simplenext, overlay);
-                    ++i;
-                }
-                else
+            while(simplenext!= simple2){
+                if(overlay){
                     break;
-            }
-            if(simplenext!= simple1){
-                if(!overlay){
-                    cout<<"overlay= 0"<<endl;
-                    if(simplenext==simple2)
-                        return step;
-                    else{
-                        ++step;
-                        cout<<"step: "<<step<<endl;
-                        step=simple_path(simplenext, simple2);
+                }
+                // if(simplenext!= simple1)
+                //     step= simple_path(simplenext, simple2);
+                // if(step== 0){
+                vector<int>priDir= priority_queue(simple1, simple2);
+                simple1= simplenext;
+                while(simplenext==simple1){
+                    if(i<4){
+                        simplenext= get_dir(priDir[i], simple1, overlay, over);
+                        i++;
                     }
                 }
+                step= simple_path(simplenext, simple2);
+                // }
+                // else{
+                //     countstep+=step;
+                //     step= 0;
+                // }
+                if(simple1!= over)
+                    break;
                 else
-                {
-                    cout<<"oooverlay= 1"<<endl;
-                    --step;
                     overlay= 0;
-                    cout<<"step: "<<step<<endl;
-                }
-                cout<<"kksimplenext= "<<simplenext.first<<simplenext.second<<", simple1: "<<simple1.first<<simple1.second<<endl;
             }
-            // else{
-            //     cout<<"simple1= simplenext"<<endl;
-            //     while(simple1== simplenext){
-            //         if(i<4){
-            //             cout<<"i: "<<i<<endl;
-            //             simplenext= get_dir(priDir[i], simplenext, overlay);
-            //             ++i;
-            //         }
-            //         else
-            //             break;
-            //     }
-            // }
-            return step;
+            return countstep;
         }
 
-        Pos get_dir(int way, Pos simplenext, int &overlay){
+        Pos get_dir(int way, Pos simplenext, bool &overlay, Pos& over){
             Pos tmp;
             switch(way){
                 case(UP):{
@@ -317,10 +298,10 @@ class Floor{
             if(floor[tmp.first][tmp.second].val!= 1){
                 if(floor[simplenext.first][simplenext.second].pre==tmp){
                     overlay= 1;
+                    over= tmp;
                     cout<<"overlay= 1"<<endl;
                 }
-                else
-                    floor[tmp.first][tmp.second].pre= simplenext;
+                floor[tmp.first][tmp.second].pre= simplenext;
                 cout<<"tmp= "<<tmp.first<<", "<<tmp.second<<endl;
                 cout<<"tmp.pre: "<<floor[tmp.first][tmp.second].pre.first<<floor[tmp.first][tmp.second].pre.second<<", simplenext= "<<simplenext.first<<simplenext.second<<endl;
                 return tmp;
