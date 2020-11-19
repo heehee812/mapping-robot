@@ -14,7 +14,7 @@ class Point{
         Pos up, down, left, right;
     public:
         int val, invalid= 0;
-        Pos pos, pre;
+        Pos pos, pre= pos;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
             return up;
@@ -240,7 +240,95 @@ class Floor{
             cout<<endl;
         }
         int simple_path(Pos simple1, Pos simple2){
-            return 5;
+            static int step= 0;
+            Pos simplenext= simple1;
+            cout<<"simplenext: "<<simplenext.first<<simplenext.second<<endl;
+            static int overlay= 0;
+            int i= 0;
+            vector<int> priDir= priority_queue(simple1, simple2);
+            for(auto i: priDir)
+                cout<<i<<" ";
+            cout<<endl;
+            while(simple1== simplenext){
+                cout<<"simple1= simplenext"<<endl;
+                if(i<4){
+                    cout<<"i: "<<i<<endl;
+                    simplenext= get_dir(priDir[i], simplenext, overlay);
+                    ++i;
+                }
+                else
+                    break;
+            }
+            if(simplenext!= simple1){
+                if(!overlay){
+                    cout<<"overlay= 0"<<endl;
+                    if(simplenext==simple2)
+                        return step;
+                    else{
+                        ++step;
+                        cout<<"step: "<<step<<endl;
+                        step=simple_path(simplenext, simple2);
+                    }
+                }
+                else
+                {
+                    cout<<"oooverlay= 1"<<endl;
+                    --step;
+                    overlay= 0;
+                    cout<<"step: "<<step<<endl;
+                }
+                cout<<"kksimplenext= "<<simplenext.first<<simplenext.second<<", simple1: "<<simple1.first<<simple1.second<<endl;
+            }
+            // else{
+            //     cout<<"simple1= simplenext"<<endl;
+            //     while(simple1== simplenext){
+            //         if(i<4){
+            //             cout<<"i: "<<i<<endl;
+            //             simplenext= get_dir(priDir[i], simplenext, overlay);
+            //             ++i;
+            //         }
+            //         else
+            //             break;
+            //     }
+            // }
+            return step;
+        }
+
+        Pos get_dir(int way, Pos simplenext, int &overlay){
+            Pos tmp;
+            switch(way){
+                case(UP):{
+                    tmp= floor[simplenext.first][simplenext.second].get_up();
+                    break;
+                }
+                case(DOWN):{
+                    tmp= floor[simplenext.first][simplenext.second].get_down();
+                    break;
+                }
+                case(LEFT):{
+                    tmp= floor[simplenext.first][simplenext.second].get_left();
+                    break;
+                }
+                case(RIGHT):{
+                    tmp= floor[simplenext.first][simplenext.second].get_right();
+                    break;
+                }
+            }
+            if(floor[tmp.first][tmp.second].val!= 1){
+                if(floor[simplenext.first][simplenext.second].pre==tmp){
+                    overlay= 1;
+                    cout<<"overlay= 1"<<endl;
+                }
+                else
+                    floor[tmp.first][tmp.second].pre= simplenext;
+                cout<<"tmp= "<<tmp.first<<", "<<tmp.second<<endl;
+                cout<<"tmp.pre: "<<floor[tmp.first][tmp.second].pre.first<<floor[tmp.first][tmp.second].pre.second<<", simplenext= "<<simplenext.first<<simplenext.second<<endl;
+                return tmp;
+            }
+            else{
+                cout<<"simplenext= "<<simplenext.first<<", "<<simplenext.second<<endl;
+                return simplenext;
+            }
         }
         
         vector<int> priority_queue(Pos simple1, Pos simple2){
@@ -334,4 +422,5 @@ int main(int argc, char *argv[]){
     // }
     // fr.print_floor();
     int kk=fr.simple_path(make_pair(4,2), make_pair(1, 1));
+    cout<<"kk: "<<kk<<endl;
 }
