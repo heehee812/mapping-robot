@@ -241,16 +241,16 @@ class Floor{
         }
         int simple_path(Pos simple1, Pos simple2){
             int countstep= 0;
-            int wall= 1;
             floor[simple1.first][simple1.second].pre= simple1;
-            simple1= get_priDir(simple1, simple2, countstep, 0, wall);
+            simple1= get_priDir(simple1, simple2, countstep, 0);
             cout<<"coutstep= "<<countstep<<endl;
             initialize_simple_path();
             return countstep;
         }
-        Pos get_priDir(Pos simple1, Pos simple2, int &countstep, int i, int &wall){
+        Pos get_priDir(Pos simple1, Pos simple2, int &countstep, int i){
             vector<int> priDir= priority_queue(simple1, simple2);
-            int overlay= 0;
+            static int overlay= 0;
+            static int wall= 1;
             cout<<"simple1: "<<simple1.first<<simple1.second<<", simple2: "<<simple2.first<<simple2.second<<endl;
             while(wall){
                 cout<<"wall= 1"<<endl;
@@ -265,14 +265,17 @@ class Floor{
                 if(i<4){
                     cout<<"i= "<<i<<endl;
                     wall= walk(i, priDir, simple1, countstep, overlay);
+                    cout<<"wall: "<<wall<<endl;
                     i++;
                 }
                 else
                     break;
                 if(!wall){
+                    cout<<"simple1: "<<simple1.first<<", "<<simple1.second<<endl;
                     if(simple1!= simple2){
                         wall= 1;
-                        simple1= get_priDir(simple1, simple2, countstep, 0, wall);
+                        simple1= get_priDir(simple1, simple2, countstep, 0);
+                        cout<<"[in]simple1: "<<simple1.first<<", "<<simple1.second<<endl;
                     }
                     cout<<"coutstep:: "<<countstep<<endl;
                 }
