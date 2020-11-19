@@ -216,13 +216,11 @@ class Floor{
         void print_waitingStack(){
             Stack copy= waitingStack;
             while(!copy.empty()){
-                cout<<"("<<copy.top().first<<", "<<copy.top().second<<") ";
                 copy.pop();
             }
             cout<<endl;
         }
         int simple_path(Pos simple1, Pos simple2){
-            cout<<"simple1: "<<simple1.first<<", "<<simple1.second<<" simple2: "<<simple2.first<<", "<<simple2.second<<endl;
             static int countstep= 0;
             static bool overlay= 0;
             static Pos over= simple1;
@@ -230,7 +228,6 @@ class Floor{
             Pos simplenext= simple1;
             int i= 0;
             while(simplenext!= simple2){
-                cout<<"simplenext= "<<simplenext.first<<simplenext.second<<endl;
                 vector<int>priDir= priority_queue(simple1, simple2);
                 simple1= simplenext;
                 while(simplenext==simple1&&!overlay){
@@ -243,6 +240,7 @@ class Floor{
                         countstep--;
                     }
                 }
+                cout<<"move to : "<<simplenext.first<<simplenext.second<<endl;
                 if(overlay){
                     break;
                 }
@@ -266,7 +264,6 @@ class Floor{
 
         Pos get_dir(int way, Pos simplenext, bool &overlay, Pos& over, int &countstep){
             Pos tmp;
-            cout<<"way= "<<way<<endl;
             switch(way){
                 case(UP):{
                     if(simplenext.first>0){
