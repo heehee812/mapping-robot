@@ -6,7 +6,7 @@ enum WAY{UP= 1, DOWN, LEFT, RIGHT};
 typedef pair<int, int> Pos;
 typedef queue<Pos> Queue;
 typedef stack<Pos> Stack;
-int row, col, Battery, Step= 0;
+int row, col, Step= 0, Battery;
 
 /*class*/
 class Point{
@@ -14,7 +14,7 @@ class Point{
         Pos up, down, left, right;
     public:
         int val, invalid= 0;
-        Pos pos, pre;
+        Pos pos, pre= pos;
         Pos get_up(){ 
             up= make_pair(pos.first-1, pos.second);
             return up;
@@ -39,6 +39,7 @@ class Floor{
         Queue readyQueue;
         Stack waitingStack;
         Point **floor;
+        bool enough= 1;
         Floor(){
             floor= new Point*[row];
             for(int i= 0; i<row; i++){
@@ -208,8 +209,8 @@ class Floor{
                 readyQueue.pop();
                 floor[tmp.first][tmp.second].val= 2;
                 Step++;
-                cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
                 waitingStack.push(tmp);
+                cout<<"move to : "<<tmp.first<<tmp.second<<endl;
             }
         }
         void print_waitingStack(){
@@ -221,143 +222,255 @@ class Floor{
             cout<<endl;
         }
         int simple_path(Pos simple1, Pos simple2){
-            int countstep= 0;
-            floor[simple1.first][simple1.second].pre= simple1;
-            // Pos simple1Pre= simple1;
-            while(simple1!= simple2){
-                vector<int> priDir= priority_queue(simple1, simple2);
-                // for(auto i: priDir)
-                //     cout<<i<<" ";
-                // cout<<endl;
-                int i= 0;
-                while(walk(priDir[i], simple1, countstep)&&i<4){
-                    i++;
+            cout<<"simple1: "<<simple1.first<<", "<<simple1.second<<" simple2: "<<simple2.first<<", "<<simple2.second<<endl;
+            static int countstep= 0;
+            static bool overlay= 0;
+            static Pos over= simple1;
+            static bool arrive= 0;
+            Pos simplenext= simple1;
+            int i= 0;
+            while(simplenext!= simple2){
+                cout<<"simplenext= "<<simplenext.first<<simplenext.second<<endl;
+                vector<int>priDir= priority_queue(simple1, simple2);
+                simple1= simplenext;
+                while(simplenext==simple1&&!overlay){
+                    if(i<priDir.size()){
+                        simplenext= get_dir(priDir[i], simple1, overlay, over, countstep);
+                        i++;
+                    }
+                    else{
+                        overlay= 1;
+                        countstep--;
+                    }
+                }
+                if(overlay){
+                    break;
+                }
+                int step= simple_path(simplenext, simple2);
+                if(arrive)
+                    break;
+                if(overlay){
+                    if(simple1!= over){
+                        break;
+                    }
+                    else{
+                        overlay= 0;
+                        simplenext= simple1;
+                    }
                 }
             }
-            // cout<<"coutstep= "<<countstep<<endl;
-            initialize_simple_path();
+            if(simplenext== simple2)
+                arrive= 1;
             return countstep;
         }
+
+        Pos get_dir(int way, Pos simplenext, bool &overlay, Pos& over, int &countstep){
+            Pos tmp;
+            cout<<"way= "<<way<<endl;
+            switch(way){
+                case(UP):{
+                    if(simplenext.first>0){
+                        tmp= floor[simplenext.first][simplenext.second].get_up();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
+                    break;
+                }
+                case(DOWN):{
+                    if(simplenext.first<row-1){
+                        tmp= floor[simplenext.first][simplenext.second].get_down();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
+                    break;
+                }
+                case(LEFT):{
+                    if(simplenext.second>0){
+                        tmp= floor[simplenext.first][simplenext.second].get_left();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
+                    break;
+                }
+                case(RIGHT):{
+                    if(simplenext.second<col-1){
+                        tmp= floor[simplenext.first][simplenext.second].get_right();
+                        if(floor[tmp.first][tmp.second].val!= 1){
+                            if(floor[simplenext.first][simplenext.second].pre==tmp){
+                                overlay= 1;
+                                over= tmp;
+                                countstep--;
+                            }
+                            else
+                                countstep++;
+                            floor[tmp.first][tmp.second].pre= simplenext;
+                            return tmp;
+                        }
+                        else{
+                            return simplenext;
+                        }
+                    }
+                    else{
+                            return simplenext;
+                        }
+                    break;
+                }
+            }
+            return tmp;
+        }
+        
         vector<int> priority_queue(Pos simple1, Pos simple2){
             vector<int> priDir;
+            Pos tmp= floor[simple1.first][simple1.second].pre;
+            Point s1= floor[simple1.first][simple1.second];
             if(simple1.first>simple2.first){//up
-                if(simple1.second<simple2.second)//right
-                    priDir= {RIGHT, UP, LEFT, DOWN};
-                else if(simple1.second>simple2.second)//left
-                    priDir= {LEFT, UP, RIGHT, DOWN};
-                else
-                    priDir= {UP, RIGHT, LEFT, DOWN};
+                if(simple1.second<simple2.second){//right
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, LEFT, DOWN, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, UP, LEFT, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {RIGHT, UP, DOWN,};
+                    else if(tmp== s1.get_right())
+                        priDir= {UP, LEFT, DOWN};
+                    else
+                        priDir= {RIGHT, UP, LEFT, DOWN};
+                }
+                else if(simple1.second>simple2.second){//left
+                    if(tmp== s1.get_up())
+                        priDir= {LEFT, RIGHT, DOWN, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {LEFT, UP, RIGHT, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {UP, RIGHT, DOWN,};
+                    else if(tmp== s1.get_right())
+                        priDir= {LEFT, UP, DOWN};
+                    else
+                        priDir= {LEFT, UP, RIGHT, DOWN};
+                }
+                else{
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, LEFT, DOWN, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {UP, RIGHT, LEFT, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {UP, RIGHT, DOWN,};
+                    else if(tmp== s1.get_right())
+                        priDir= {UP, LEFT, DOWN};
+                    else
+                        priDir= {UP, RIGHT, LEFT, DOWN};
+                }
             }
             else if(simple1.first<simple2.first){//down
-                if(simple1.second<simple2.second)//right
-                    priDir= {RIGHT, DOWN, LEFT, UP};
-                else if(simple1.second>simple2.second)//left
-                    priDir= {LEFT, DOWN, RIGHT, UP};
-                else
-                    priDir= {DOWN, RIGHT, LEFT, UP};
+                if(simple1.second<simple2.second){//right
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, DOWN, LEFT, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, LEFT, UP, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {RIGHT, DOWN, UP,};
+                    else if(tmp== s1.get_right())
+                        priDir= {DOWN, LEFT, UP};
+                    else
+                        priDir= {RIGHT, DOWN, LEFT, UP};
+                }
+                else if(simple1.second>simple2.second){//left
+                    if(tmp== s1.get_up())
+                        priDir= {LEFT, DOWN, RIGHT, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {LEFT, RIGHT, UP, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {DOWN, RIGHT, UP,};
+                    else if(tmp== s1.get_right())
+                        priDir= {LEFT, DOWN, UP};
+                    else
+                        priDir= {LEFT, DOWN, RIGHT, UP};
+                }
+                else{
+                    if(tmp== s1.get_up())
+                        priDir= {DOWN, RIGHT, LEFT, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, LEFT, UP, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {DOWN, RIGHT, UP,};
+                    else if(tmp== s1.get_right())
+                        priDir= {DOWN, LEFT, UP};
+                    else
+                        priDir= {DOWN, RIGHT, LEFT, UP};
+                }
             }
             else{//equal
-                if(simple1.second<simple2.second)//right
-                    priDir= {RIGHT, DOWN, UP, LEFT};
-                else if(simple1.second>simple2.second)//left
-                    priDir= {LEFT, DOWN, UP, RIGHT};
+                if(simple1.second<simple2.second){//right
+                    if(tmp== s1.get_up())
+                        priDir= {RIGHT, DOWN, LEFT, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {RIGHT, UP, LEFT, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {RIGHT, DOWN, UP,};
+                    else if(tmp== s1.get_right())
+                        priDir= {DOWN, UP, LEFT};
+                    else
+                        priDir= {RIGHT, DOWN, UP, LEFT};
+                }
+                else if(simple1.second>simple2.second){//left
+                    if(tmp== s1.get_up())
+                        priDir= {LEFT, DOWN, RIGHT, UP};
+                    else if(tmp== s1.get_down())
+                        priDir= {LEFT, UP, RIGHT, DOWN};
+                    else if(tmp== s1.get_left())
+                        priDir= {DOWN, UP, RIGHT,};
+                    else if(tmp== s1.get_right())
+                        priDir= {LEFT, DOWN, UP};
+                    else
+                        priDir= {LEFT, DOWN, UP, RIGHT};
+                }
             }
             return priDir;
-        }
-        int walk(int i, Pos &simple1, int &countstep){
-            int wall= 1;
-            Pos tmp;
-            switch(i){
-                case UP:{
-                    if(simple1.first!= 0){
-                        tmp= floor[simple1.first][simple1.second].get_up();
-                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= floor[simple1.first][simple1.second].pre){
-                                wall= 0;
-                                countstep++;
-                                floor[tmp.first][tmp.second].pre= simple1;
-                                simple1= tmp;
-                            }
-                            else{
-                                simple1= tmp;
-                                countstep--;
-                                tmp= floor[simple1.first][simple1.second].get_left();
-                                floor[tmp.first][tmp.second].invalid= 1;
-                            }
-                        }
-                    }
-                    break;
-                }
-                case DOWN:{
-                    if(simple1.first!= row-1){
-                        tmp= floor[simple1.first][simple1.second].get_down();
-                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= floor[simple1.first][simple1.second].pre){
-                                wall= 0;
-                                countstep++;
-                                floor[tmp.first][tmp.second].pre= simple1;
-                                simple1= tmp;
-                            }
-                            else{
-                                simple1= tmp;
-                                countstep--;
-                                tmp= floor[simple1.first][simple1.second].get_left();
-                                floor[tmp.first][tmp.second].invalid= 1;
-                            }
-                        }
-                    }
-                    break;
-                }
-                case LEFT:{
-                    if(simple1.first!= 0){
-                        tmp= floor[simple1.first][simple1.second].get_left();
-                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= floor[simple1.first][simple1.second].pre){
-                                wall= 0;
-                                countstep++;
-                                floor[tmp.first][tmp.second].pre= simple1;
-                                simple1= tmp;
-                            }
-                            else{
-                                simple1= tmp;
-                                countstep--;
-                                tmp= floor[simple1.first][simple1.second].get_left();
-                                floor[tmp.first][tmp.second].invalid= 1;
-                            }
-                        }
-                    }
-                    break;
-                }
-                case RIGHT:{
-                    if(simple1.first!= col-1){
-                        tmp= floor[simple1.first][simple1.second].get_right();
-                        if(floor[tmp.first][tmp.second].val!= 1&& !floor[tmp.first][tmp.second].invalid){
-                            if(tmp!= floor[simple1.first][simple1.second].pre){
-                                wall= 0;
-                                countstep++;
-                                floor[tmp.first][tmp.second].pre= simple1;
-                                simple1= tmp;
-                            }
-                            else{
-                                simple1= tmp;
-                                countstep--;
-                                tmp= floor[simple1.first][simple1.second].get_left();
-                                floor[tmp.first][tmp.second].invalid= 1;
-                            }
-                        }
-                    }
-                    break;
-                }
-                default: break;
-            }
-            return wall;
-        }
-        void initialize_simple_path(){
-            for(int i= 0; i<row; i++){
-                for(int j= 0; j<col; j++){
-                    floor[i][j].invalid= 0;
-                }
-            }
         }
 };
 
@@ -385,25 +498,30 @@ int main(int argc, char *argv[]){
     //trace the floor
     fr.waitingStack.push(R.pos);
     while(!fr.waitingStack.empty()){
-        //find the simple path
         Pos tmp= fr.waitingStack.top();
-        // cout<<"Step= "<<Step<<" , move to ("<<tmp.first<<", "<<tmp.second<<")"<<endl;
         fr.waitingStack.pop();
         fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-        cout<<"Queue: ";
-        fr.print_queue();
+        // cout<<"Queue: ";
+        // fr.print_queue();
         if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
             Pos simple1= tmp;
-            while(fr.readyQueue.empty()){
+            while(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
                 tmp= fr.waitingStack.top();
                 fr.waitingStack.pop();
                 fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
             }
-            Step+=fr.simple_path(simple1, tmp);
+            if(!fr.readyQueue.empty()){
+                int stepfromnow= fr.simple_path(simple1, tmp);
+                Step+=stepfromnow;
+            }
         }
-        fr.update_floor();
-        cout<<"Stack: ";
+        while(!fr.readyQueue.empty()){
+            fr.update_floor();
+            // cout<<"Stack: ";
+            // fr.print_waitingStack();
+        }
         fr.print_waitingStack();
     }
     fr.print_floor();
+    return 0;
 }
