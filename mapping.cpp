@@ -12,6 +12,7 @@ int distanceToCharge= 0, battery;
 
 int getIndex(vector<Pos> , Pos );
 
+
 /*class*/
 class Point{
     private:
