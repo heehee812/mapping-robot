@@ -11,6 +11,8 @@ Pos charge;
 int battery;
 
 int getIndex(vector<Pos> , Pos );
+void print_result();
+vector<Pos> mapping;
 
 
 /*class*/
@@ -211,15 +213,17 @@ class Floor{
             }
             cout<<endl;
         }
-        void update_floor(int distanceToCharge){
+        void update_floor(Pos rst){
             while(!readyQueue.empty()){
                 Pos tmp= readyQueue.front();
+                int distanceToCharge= get_simplepath(rst, R.pos);
                 if(battery<=distanceToCharge){
-                    cout<<"[charge]"<<endl;
                     Step+= distanceToCharge;
+                    print_simplepath(rst, R.pos);
                     int distanceComeBack= get_simplepath(R.pos, tmp);
                     Step+= distanceComeBack;
                     battery= Battery- distanceComeBack;
+                    print_simplepath(R.pos, tmp);
                 }
                 if(battery>distanceToCharge){
                     readyQueue.pop();
@@ -228,7 +232,8 @@ class Floor{
                     battery--;
                     distanceToCharge= get_simplepath(tmp, R.pos);
                     waitingStack.push(tmp);
-                    cout<<"move to : "<<tmp.first<<tmp.second<<endl;
+                    mapping.push_back(tmp);
+                    // cout<<"("<<tmp.first<<", "<<tmp.second<<")"<<endl;
                 }
             }
         }
@@ -314,7 +319,18 @@ class Floor{
         int get_simplepath(Pos simple1, Pos simple2){
             recordpath.clear();
             simple_path(simple1, simple2);
-            return recordpath.size()-1;
+            int size= recordpath.size()-1;
+            recordpath.clear();
+            return size;
+        }
+
+        void print_simplepath(Pos simple1, Pos simple2){
+            recordpath.clear();
+            simple_path(simple1, simple2);
+            for(auto i: recordpath){
+                mapping.push_back(i);
+            }
+            recordpath.clear();
         }
         
         void initialize_path(){
@@ -514,8 +530,6 @@ int main(int argc, char *argv[]){
         Pos tmp= fr.waitingStack.top();
         fr.waitingStack.pop();
         fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-        cout<<"Queue: ";
-        fr.print_queue();
 
         if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
             Pos simple1= tmp;
@@ -530,29 +544,27 @@ int main(int argc, char *argv[]){
                 if(battery>stepfromnow+ simple2ToR){
                     Step+=stepfromnow;
                     battery-=stepfromnow;
+                    fr.print_simplepath(simple1, tmp);
                 }
                 else{
-                    cout<<"[charge]"<<endl;
                     int simple1ToR= fr.get_simplepath(simple1, R.pos);
                     Step+= simple1ToR;
+                    fr.print_simplepath(tmp, R.pos);
                     int RTosimple2= fr.get_simplepath(R.pos, tmp);
                     Step+= RTosimple2;
                     battery= Battery-RTosimple2;
+                    fr.print_simplepath(R.pos, tmp);
                 }
             }
         }
 
-        int distanceToCharge= fr.get_simplepath(tmp, R.pos);
         while(!fr.readyQueue.empty()){
-                fr.update_floor(distanceToCharge);
-            // cout<<"Stack: ";
-            // fr.print_waitingStack();
+                fr.update_floor(tmp);
         }
-        fr.print_waitingStack();
+        // fr.print_waitingStack();
     }
-    fr.print_floor();
-    cout<<"Step: "<<Step<<endl;
-    cout<<"battery: "<<battery<<endl;
+    print_result();
+    ifile.close();
     return 0;
 }
 
@@ -565,4 +577,17 @@ int getIndex(vector<Pos> v, Pos K)
         index = it - v.begin();
     }
     return index;
+}
+
+void print_result(){
+    string filepath= "final.path";
+    ofstream ofile(filepath, ios::out);
+    if(ofile.is_open()){
+        ofile<<Step<<endl;
+
+        for(auto i: mapping){
+            ofile<<"("<<i.first<<", "<<i.second<<")"<<endl;
+        }
+        
+    }
 }
