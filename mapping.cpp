@@ -44,6 +44,7 @@ class Floor{
         Stack waitingStack;
         Point **floor;
         bool enough= 1;
+        vector<Pos> recordpath;
         Floor(){
             floor= new Point*[row];
             for(int i= 0; i<row; i++){
@@ -220,8 +221,7 @@ class Floor{
                     waitingStack.push(tmp);
                     charge= tmp;
                     cout<<"move to : "<<tmp.first<<tmp.second<<endl;
-                    int distance= simple_path(tmp, R.pos);
-                    cout<<"distance: "<<distance<<endl;
+                    simple_path(tmp, R.pos);
                 // }
                 // else{
                 //     Step+= simple_path(charge, R.pos);
@@ -238,8 +238,7 @@ class Floor{
             }
             cout<<endl;
         }
-        int simple_path(Pos simple1, Pos simple2){
-            int countstep= 0;
+        void simple_path(Pos simple1, Pos simple2){
             bool overlay= 0;
             static bool arrive= 0;
             static bool duplicate= 0;
@@ -247,15 +246,18 @@ class Floor{
             static vector<Pos> path;
             Pos simplenext= simple1;
             int i= 0;
+
+            recordpath.push_back(simple1);
             while(simplenext!= simple2){
                 vector<int>priDir= priority_queue(simple1, simple2);
                 simple1= simplenext;
-                cout<<"simplesimple: "<<simple1.first<<simple1.second<<endl;
+                auto k= find(recordpath.begin(), recordpath.end(), simplenext);
+                auto r= recordpath.end();
+                if(k!= recordpath.end())
+                    recordpath.erase(k+1, r);
                 while(simplenext==simple1&&!overlay){
                     if(i<priDir.size()){
-                        simplenext= get_dir(priDir[i], simple1, overlay, countstep);
-                        cout<<"get dir: "<<simplenext.first<<simplenext.second<<endl;
-                        cout<<"used: "<<floor[simplenext.first][simplenext.second].used<<endl;
+                        simplenext= get_dir(priDir[i], simple1, overlay);
                         i++;
                     }
                     else{
@@ -263,28 +265,34 @@ class Floor{
                     }
                 }
                 if(overlay){
-                    countstep--;
+                    auto i= find(recordpath.begin(), recordpath.end(), simplenext);
+                    if(i!= recordpath.end())
+                        recordpath.erase(i);
                     break;
                 }
                 if(floor[simplenext.first][simplenext.second].used){
+                    auto i= find(recordpath.begin(), recordpath.end(), simplenext);
+                    if(i!= recordpath.end())
+                        recordpath.erase(i);
+                    break;
                     duplicateValue= simplenext;
                     duplicate= 1;
                     break;
                 }
                 floor[simplenext.first][simplenext.second].used= 1;
                 path.push_back(simplenext);
-                cout<<"1move to :"<<simplenext.first<<", "<<simplenext.second<<endl;
-                countstep+= simple_path(simplenext, simple2);
-                cout<<"coutstep= "<<countstep<<endl;
+                simple_path(simplenext, simple2);
                 if(duplicate)
                 {
                     if(getIndex(path, simplenext)>=getIndex(path, duplicateValue)){
                         if(simplenext== duplicateValue){
+                            auto i= find(recordpath.begin(), recordpath.end(), duplicateValue);
+                            auto j= recordpath.end()-1;
+                            if(i!= recordpath.end())
+                                recordpath.erase(i+1, j);
                             duplicate= 0;
-                            cout<<"find: "<<simplenext.first<<", "<<simplenext.second<<endl;
                         }
                         else{
-                            cout<<"find duplicate: "<<duplicateValue.first<<duplicateValue.second<<endl;
                             break;
                         }
                     }
@@ -297,11 +305,15 @@ class Floor{
                     break;
             }
             if(simplenext== simple2){
-                cout<<"arrive!"<<endl;
                 arrive= 1;
                 initialize_path();
             }
-            return countstep;
+        }
+
+        int get_simplepath(Pos simple1, Pos simple2){
+            recordpath.clear();
+            simple_path(simple1, simple2);
+            return recordpath.size()-1;
         }
         
         void initialize_path(){
@@ -312,14 +324,13 @@ class Floor{
                 }
         }
 
-        Pos get_dir(int way, Pos simplenext, bool &overlay, int &countstep){
+        Pos get_dir(int way, Pos simplenext, bool &overlay){
             Pos tmp;
             switch(way){
                 case(UP):{
                     if(simplenext.first>0){
                         tmp= floor[simplenext.first][simplenext.second].get_up();
                         if(floor[tmp.first][tmp.second].val!= 1){
-                            countstep++;
                             floor[tmp.first][tmp.second].pre= simplenext;
                             return tmp;
                         }
@@ -331,7 +342,6 @@ class Floor{
                     if(simplenext.first<row-1){
                         tmp= floor[simplenext.first][simplenext.second].get_down();
                         if(floor[tmp.first][tmp.second].val!= 1){
-                            countstep++;
                             floor[tmp.first][tmp.second].pre= simplenext;
                             return tmp;
                         }
@@ -343,7 +353,6 @@ class Floor{
                     if(simplenext.second>0){
                         tmp= floor[simplenext.first][simplenext.second].get_left();
                         if(floor[tmp.first][tmp.second].val!= 1){
-                            countstep++;
                             floor[tmp.first][tmp.second].pre= simplenext;
                             return tmp;
                         }
@@ -355,7 +364,6 @@ class Floor{
                     if(simplenext.second<col-1){
                         tmp= floor[simplenext.first][simplenext.second].get_right();
                         if(floor[tmp.first][tmp.second].val!= 1){
-                            countstep++;
                             floor[tmp.first][tmp.second].pre= simplenext;
                             return tmp;
                         }
@@ -500,51 +508,49 @@ int main(int argc, char *argv[]){
     battery= Battery;
 
     //trace the floor
-    // fr.waitingStack.push(R.pos);
-    // while(!fr.waitingStack.empty()){
-    //     Pos tmp= fr.waitingStack.top();
-    //     fr.waitingStack.pop();
-    //     charge= tmp;
-    //     // distanceToCharge= fr.simple_path(tmp, R.pos);
-    //     // cout<<"distance: "<<distanceToCharge<<endl;
-    //     fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-    //     cout<<"Queue: ";
-    //     fr.print_queue();
+    fr.waitingStack.push(R.pos);
+    while(!fr.waitingStack.empty()){
+        Pos tmp= fr.waitingStack.top();
+        fr.waitingStack.pop();
+        charge= tmp;
+        // distanceToCharge= fr.simple_path(tmp, R.pos);
+        // cout<<"distance: "<<distanceToCharge<<endl;
+        fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
+        cout<<"Queue: ";
+        fr.print_queue();
 
-    //     if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
-    //         Pos simple1= tmp;
-    //         while(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
-    //             tmp= fr.waitingStack.top();
-    //             fr.waitingStack.pop();
-    //             fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
-    //         }
-    //         if(!fr.readyQueue.empty()){
-    //             int stepfromnow= fr.simple_path(simple1, tmp);
-    //             // int simple2ToR= fr.simple_path(tmp, R.pos);
-    //             // if(battery>stepfromnow+ simple2ToR){
-    //                 Step+=stepfromnow;
-    //                 // battery-=stepfromnow;
-    //             // }
-    //             // else{
-    //             //     int simple1ToR= fr.simple_path(simple1, R.pos);
-    //             //     Step+= simple1ToR;
-    //             //     int RTosimple2= fr.simple_path(R.pos, tmp);
-    //             //     Step+= RTosimple2;
-    //             //     battery= Battery-RTosimple2;
-    //             // }
-    //         }
-    //     }
+        if(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
+            Pos simple1= tmp;
+            while(fr.readyQueue.empty()&&!fr.waitingStack.empty()){
+                tmp= fr.waitingStack.top();
+                fr.waitingStack.pop();
+                fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
+            }
+            if(!fr.readyQueue.empty()){
+                int stepfromnow= fr.get_simplepath(simple1, tmp);
+                // int simple2ToR= fr.simple_path(tmp, R.pos);
+                // if(battery>stepfromnow+ simple2ToR){
+                    Step+=stepfromnow;
+                    // battery-=stepfromnow;
+                // }
+                // else{
+                //     int simple1ToR= fr.simple_path(simple1, R.pos);
+                //     Step+= simple1ToR;
+                //     int RTosimple2= fr.simple_path(R.pos, tmp);
+                //     Step+= RTosimple2;
+                //     battery= Battery-RTosimple2;
+                // }
+            }
+        }
 
-    //     while(!fr.readyQueue.empty()){
-    //         fr.update_floor();
-    //         // cout<<"Stack: ";
-    //         // fr.print_waitingStack();
-    //     }
-    //     fr.print_waitingStack();
-    // }
-    // fr.print_floor();
-    int kk= fr.simple_path(make_pair(2, 3), R.pos);
-    cout<<"KK: "<<kk<<endl;
+        while(!fr.readyQueue.empty()){
+            fr.update_floor();
+            // cout<<"Stack: ";
+            // fr.print_waitingStack();
+        }
+        fr.print_waitingStack();
+    }
+    fr.print_floor();
     return 0;
 }
 
