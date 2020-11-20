@@ -8,7 +8,7 @@ typedef queue<Pos> Queue;
 typedef stack<Pos> Stack;
 int row, col, Step= 0, Battery;
 Pos charge;
-int distanceToCharge= 0, battery;
+int battery;
 
 int getIndex(vector<Pos> , Pos );
 
@@ -211,25 +211,25 @@ class Floor{
             }
             cout<<endl;
         }
-        void update_floor(){
+        void update_floor(int distanceToCharge){
             while(!readyQueue.empty()){
                 Pos tmp= readyQueue.front();
-                // if(battery>distanceToCharge+1){
+                if(battery<=distanceToCharge){
+                    cout<<"[charge]"<<endl;
+                    Step+= distanceToCharge;
+                    int distanceComeBack= get_simplepath(R.pos, tmp);
+                    Step+= distanceComeBack;
+                    battery= Battery- distanceComeBack;
+                }
+                if(battery>distanceToCharge){
                     readyQueue.pop();
                     floor[tmp.first][tmp.second].val= 2;
                     Step++;
                     battery--;
+                    distanceToCharge= get_simplepath(tmp, R.pos);
                     waitingStack.push(tmp);
-                    charge= tmp;
                     cout<<"move to : "<<tmp.first<<tmp.second<<endl;
-                    simple_path(tmp, R.pos);
-                // }
-                // else{
-                //     Step+= simple_path(charge, R.pos);
-                //     int comback= simple_path(R.pos, tmp);
-                //     Step+= comback;
-                //     battery= Battery- comback;
-                // }  
+                }
             }
         }
         void print_waitingStack(){
@@ -513,9 +513,6 @@ int main(int argc, char *argv[]){
     while(!fr.waitingStack.empty()){
         Pos tmp= fr.waitingStack.top();
         fr.waitingStack.pop();
-        charge= tmp;
-        // distanceToCharge= fr.simple_path(tmp, R.pos);
-        // cout<<"distance: "<<distanceToCharge<<endl;
         fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
         cout<<"Queue: ";
         fr.print_queue();
@@ -529,29 +526,33 @@ int main(int argc, char *argv[]){
             }
             if(!fr.readyQueue.empty()){
                 int stepfromnow= fr.get_simplepath(simple1, tmp);
-                // int simple2ToR= fr.simple_path(tmp, R.pos);
-                // if(battery>stepfromnow+ simple2ToR){
+                int simple2ToR= fr.get_simplepath(tmp, R.pos);
+                if(battery>stepfromnow+ simple2ToR){
                     Step+=stepfromnow;
-                    // battery-=stepfromnow;
-                // }
-                // else{
-                //     int simple1ToR= fr.simple_path(simple1, R.pos);
-                //     Step+= simple1ToR;
-                //     int RTosimple2= fr.simple_path(R.pos, tmp);
-                //     Step+= RTosimple2;
-                //     battery= Battery-RTosimple2;
-                // }
+                    battery-=stepfromnow;
+                }
+                else{
+                    cout<<"[charge]"<<endl;
+                    int simple1ToR= fr.get_simplepath(simple1, R.pos);
+                    Step+= simple1ToR;
+                    int RTosimple2= fr.get_simplepath(R.pos, tmp);
+                    Step+= RTosimple2;
+                    battery= Battery-RTosimple2;
+                }
             }
         }
 
+        int distanceToCharge= fr.get_simplepath(tmp, R.pos);
         while(!fr.readyQueue.empty()){
-            fr.update_floor();
+                fr.update_floor(distanceToCharge);
             // cout<<"Stack: ";
             // fr.print_waitingStack();
         }
         fr.print_waitingStack();
     }
     fr.print_floor();
+    cout<<"Step: "<<Step<<endl;
+    cout<<"battery: "<<battery<<endl;
     return 0;
 }
 
