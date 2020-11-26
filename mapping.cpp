@@ -66,6 +66,7 @@ class Floor{
             }
         }
         void around_point(Point ptr, int way, Queue &queue, int dir){
+            cout<<"way: "<<way<<endl;
             switch(way){
                 case(UP):{
                     if(ptr.pos.first!= 0){
@@ -83,10 +84,14 @@ class Floor{
                             }
                             else{
                                 if(floor[ptr.get_up().first][ptr.get_up().second-1].val== 0){
+                                    cout<<"dir= 0, in up, left= 0"<<endl;
                                     queue.push(make_pair(ptr.get_up().first, ptr.get_up().second-1));
                                     if(ptr.pos.second!= 0){
-                                        if(!floor[ptr.get_left().first][ptr.get_left().second].used)
+                                        cout<<"???"<<endl;
+                                        if(!floor[ptr.get_left().first][ptr.get_left().second].used){
+                                            cout<<"here"<<endl;
                                             around_point(ptr, LEFT, queue, dir);
+                                        }
                                     }
                                 }
                             }
@@ -151,8 +156,10 @@ class Floor{
                 }
                 case(LEFT):{
                     if(ptr.pos.second!= 0){
+                        cout<<"val: "<<floor[ptr.get_left().first][ptr.get_left().second].val<<endl;
                         floor[ptr.get_left().first][ptr.get_left().second].used= 1;
                         if(floor[ptr.get_left().first][ptr.get_left().second].val== 0){
+                            cout<<"get left =0 in left"<<endl;
                             queue.push(ptr.get_left());
                             if(dir){
                                 if(floor[ptr.get_left().first-1][ptr.get_left().second].val== 0){
@@ -237,7 +244,7 @@ class Floor{
                 }
                 default: break;
             }
-            // initialize_path();
+            initialize_path();
         }
         void optimize_queue(Point ptr){
             Queue dirqueue[4], queue[4];
@@ -597,7 +604,7 @@ int main(int argc, char *argv[]){
     battery= Battery;
 
     //trace the floor
-    cout<<"START------"<<endl;
+    cout<<"START8------"<<endl;
     fr.waitingStack.push(R.pos);
     while(!fr.waitingStack.empty()){
         Pos tmp= fr.waitingStack.top();
