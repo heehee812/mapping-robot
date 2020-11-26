@@ -561,10 +561,16 @@ int main(int argc, char *argv[]){
         while(!fr.readyQueue.empty()){
                 fr.update_floor(tmp);
         }
+        
+        if(fr.waitingStack.empty()){
+            Step+= fr.get_simplepath(tmp, R.pos);
+            fr.print_simplepath(tmp, R.pos);
+        }
         // fr.print_waitingStack();
     }
     print_result();
     ifile.close();
+    // fr.print_floor();
     return 0;
 }
 
@@ -585,6 +591,7 @@ void print_result(){
     if(ofile.is_open()){
         ofile<<Step<<endl;
 
+        ofile<<"("<<R.pos.first<<", "<<R.pos.second<<")"<<endl;
         for(auto i: mapping){
             ofile<<"("<<i.first<<", "<<i.second<<")"<<endl;
         }
