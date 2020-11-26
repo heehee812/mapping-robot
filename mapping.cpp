@@ -75,27 +75,35 @@ class Floor{
                             if(dir){
                                 if(floor[ptr.get_up().first][ptr.get_up().second+1].val== 0){
                                     queue.push(make_pair(ptr.get_up().first, ptr.get_up().second+1));
-                                    if(!floor[ptr.get_right().first][ptr.get_right().second].used)
-                                        around_point(ptr, RIGHT, queue, dir);
+                                    if(ptr.pos.second!= col-1){
+                                        if(!floor[ptr.get_right().first][ptr.get_right().second].used)
+                                            around_point(ptr, RIGHT, queue, dir);
+                                    }
                                 }
                             }
                             else{
                                 if(floor[ptr.get_up().first][ptr.get_up().second-1].val== 0){
                                     queue.push(make_pair(ptr.get_up().first, ptr.get_up().second-1));
-                                    if(!floor[ptr.get_left().first][ptr.get_left().second].used)
-                                        around_point(ptr, LEFT, queue, dir);
+                                    if(ptr.pos.second!= 0){
+                                        if(!floor[ptr.get_left().first][ptr.get_left().second].used)
+                                            around_point(ptr, LEFT, queue, dir);
+                                    }
                                 }
                             }
                         }
                     }
                     if(queue.empty()){
                         if(dir){
-                            if(!floor[ptr.get_right().first][ptr.get_right().second].used)
-                                around_point(ptr, RIGHT, queue, dir);
+                            if(ptr.pos.second!= col-1){
+                                if(!floor[ptr.get_right().first][ptr.get_right().second].used)
+                                    around_point(ptr, RIGHT, queue, dir);
+                            }
                         }
                         else{
-                            if(!floor[ptr.get_left().first][ptr.get_left().second].used)
-                                around_point(ptr, LEFT, queue, dir);
+                            if(ptr.pos.second!= 0){
+                                if(!floor[ptr.get_left().first][ptr.get_left().second].used)
+                                    around_point(ptr, LEFT, queue, dir);
+                            }
                         }
                     }
                     break;
@@ -108,27 +116,35 @@ class Floor{
                             if(dir){
                                 if(floor[ptr.get_down().first][ptr.get_down().second-1].val== 0){
                                     queue.push(make_pair(ptr.get_down().first, ptr.get_down().second-1));
-                                    if(!floor[ptr.get_left().first][ptr.get_left().second].used)
-                                        around_point(ptr, LEFT, queue, dir);
+                                    if(ptr.pos.second!= 0){
+                                        if(!floor[ptr.get_left().first][ptr.get_left().second].used)
+                                            around_point(ptr, LEFT, queue, dir);
+                                    }
                                 }
                             }
                             else{
                                 if(floor[ptr.get_down().first][ptr.get_down().second+1].val== 0){
                                     queue.push(make_pair(ptr.get_down().first, ptr.get_down().second+1));
-                                    if(!floor[ptr.get_right().first][ptr.get_right().second].used)
-                                        around_point(ptr, RIGHT, queue, dir);
+                                    if(ptr.pos.second!= col-1){
+                                        if(!floor[ptr.get_right().first][ptr.get_right().second].used)
+                                            around_point(ptr, RIGHT, queue, dir);
+                                    }
                                 }
                             }
                         }
                     }
                     if(queue.empty()){
                             if(dir){
-                                if(!floor[ptr.get_left().first][ptr.get_left().second].used)
-                                    around_point(ptr, LEFT, queue, dir);
+                                if(ptr.pos.second!= 0){
+                                    if(!floor[ptr.get_left().first][ptr.get_left().second].used)
+                                        around_point(ptr, LEFT, queue, dir);
+                                }
                             }
                             else{
-                                if(!floor[ptr.get_right().first][ptr.get_right().second].used)
-                                    around_point(ptr, RIGHT, queue, dir);
+                                if(ptr.pos.second!= col-1){
+                                    if(!floor[ptr.get_right().first][ptr.get_right().second].used)
+                                        around_point(ptr, RIGHT, queue, dir);
+                                }
                             }
                         }
                     break;
@@ -141,29 +157,37 @@ class Floor{
                             if(dir){
                                 if(floor[ptr.get_left().first-1][ptr.get_left().second].val== 0){
                                     queue.push(make_pair(ptr.get_left().first-1, ptr.get_left().second));
-                                    if(!floor[ptr.get_up().first][ptr.get_up().second].used)
-                                        around_point(ptr, UP, queue, dir);
+                                    if(ptr.pos.first!= 0){
+                                        if(!floor[ptr.get_up().first][ptr.get_up().second].used)
+                                            around_point(ptr, UP, queue, dir);
+                                    }
                                 }
                             }
                             else{
                                 if(ptr.pos.first!= row-1){
                                     if(floor[ptr.get_left().first+1][ptr.get_left().second].val== 0){
                                         queue.push(make_pair(ptr.get_left().first+1, ptr.get_left().second));
-                                        if(!floor[ptr.get_down().first][ptr.get_down().second].used)
-                                            around_point(ptr, DOWN, queue, dir);
+                                        if(ptr.pos.first!= row-1){
+                                            if(!floor[ptr.get_down().first][ptr.get_down().second].used)
+                                                around_point(ptr, DOWN, queue, dir);
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    else if(queue.empty()){
+                    if(queue.empty()){
                         if(dir){
-                            if(!floor[ptr.get_up().first][ptr.get_up().second].used)
-                                around_point(ptr, UP, queue, dir);
+                            if(ptr.pos.first!= 0){
+                                if(!floor[ptr.get_up().first][ptr.get_up().second].used)
+                                    around_point(ptr, UP, queue, dir);
+                            }
                         }
                         else{
-                            if(!floor[ptr.get_down().first][ptr.get_down().second].used)
-                                around_point(ptr, DOWN, queue, dir);
+                            if(ptr.pos.first!= row-1){
+                                if(!floor[ptr.get_down().first][ptr.get_down().second].used)
+                                    around_point(ptr, DOWN, queue, dir);
+                            }
                         }
                     }
                     break;
@@ -176,56 +200,65 @@ class Floor{
                             if(dir){
                                 if(ptr.pos.first!= row-1){
                                     if(floor[ptr.get_right().first+1][ptr.get_right().second].val== 0){
-                                    queue.push(make_pair(ptr.get_right().first+1, ptr.get_right().second));
-                                    if(!floor[ptr.get_down().first][ptr.get_down().second].used)
-                                        around_point(ptr, DOWN, queue, dir);
+                                        queue.push(make_pair(ptr.get_right().first+1, ptr.get_right().second));
+                                        if(ptr.pos.first!= row-1){
+                                            if(!floor[ptr.get_down().first][ptr.get_down().second].used)
+                                                around_point(ptr, DOWN, queue, dir);
+                                        }
                                     }
                                 }
                             }
                             else{
                                 if(floor[ptr.get_right().first-1][ptr.get_right().second].val== 0){
                                     queue.push(make_pair(ptr.get_right().first-1, ptr.get_right().second));
-                                    if(!floor[ptr.get_up().first][ptr.get_up().second].used)
-                                        around_point(ptr, UP, queue, dir);
+                                    if(ptr.pos.first!= 0){
+                                        if(!floor[ptr.get_up().first][ptr.get_up().second].used)
+                                            around_point(ptr, UP, queue, dir);
+                                    }
                                 }
                             }
                         }
                     }
                     if(queue.empty()){
                         if(dir){
-                            if(!floor[ptr.get_down().first][ptr.get_down().second].used)
-                                around_point(ptr, DOWN, queue, dir);
+                            if(ptr.pos.first!= row-1){
+                                if(!floor[ptr.get_down().first][ptr.get_down().second].used)
+                                    around_point(ptr, DOWN, queue, dir);
+                            }
                         }
                         else{
-                            if(!floor[ptr.get_up().first][ptr.get_up().second].used)
-                                around_point(ptr, UP, queue, dir);
+                            if(ptr.pos.first!= 0){
+                                if(!floor[ptr.get_up().first][ptr.get_up().second].used)
+                                    around_point(ptr, UP, queue, dir);
+                            }
                         }
                     }
                     break;
                 }
                 default: break;
             }
+            // initialize_path();
         }
         void optimize_queue(Point ptr){
             Queue dirqueue[4], queue[4];
             int dir= 1;
             for(int i= 0; i<4; i++){
-                around_point(ptr, i+1, dirqueue[i], 1);
                 cout<<"dir= 1, i= "<<i<<endl;
-                        Queue coo= dirqueue[i];
-                        while(!coo.empty()){
-                            cout<<coo.front().first<<coo.front().second<<", ";
-                            coo.pop();
-                        }
-                        cout<<endl;
-                around_point(ptr, i+1, queue[i], 0);
+                around_point(ptr, i+1, dirqueue[i], 1);
+                Queue coo= dirqueue[i];
+                while(!coo.empty()){
+                    cout<<coo.front().first<<coo.front().second<<", ";
+                    coo.pop();
+                }
+                cout<<endl;
                 cout<<"dir= 0, i= "<<i<<endl;
-                        Queue co= queue[i];
-                        while(!co.empty()){
-                            cout<<co.front().first<<co.front().second<<", ";
-                            co.pop();
-                        }
-                        cout<<endl;
+                around_point(ptr, i+1, queue[i], 0);
+                Queue co= queue[i];
+                while(!co.empty()){
+                    cout<<co.front().first<<co.front().second<<", ";
+                    co.pop();
+                }
+                cout<<endl;
                 if(i==0){
                     if(dirqueue[i]>=queue[i])
                         readyQueue= dirqueue[i];
