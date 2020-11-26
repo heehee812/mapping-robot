@@ -66,7 +66,6 @@ class Floor{
             }
         }
         void around_point(Point ptr, int way, Queue &queue, int dir){
-            cout<<"way: "<<way<<endl;
             switch(way){
                 case(UP):{
                     if(ptr.pos.first!= 0){
@@ -84,12 +83,9 @@ class Floor{
                             }
                             else{
                                 if(floor[ptr.get_up().first][ptr.get_up().second-1].val== 0){
-                                    cout<<"dir= 0, in up, left= 0"<<endl;
                                     queue.push(make_pair(ptr.get_up().first, ptr.get_up().second-1));
                                     if(ptr.pos.second!= 0){
-                                        cout<<"???"<<endl;
                                         if(!floor[ptr.get_left().first][ptr.get_left().second].used){
-                                            cout<<"here"<<endl;
                                             around_point(ptr, LEFT, queue, dir);
                                         }
                                     }
@@ -156,10 +152,8 @@ class Floor{
                 }
                 case(LEFT):{
                     if(ptr.pos.second!= 0){
-                        cout<<"val: "<<floor[ptr.get_left().first][ptr.get_left().second].val<<endl;
                         floor[ptr.get_left().first][ptr.get_left().second].used= 1;
                         if(floor[ptr.get_left().first][ptr.get_left().second].val== 0){
-                            cout<<"get left =0 in left"<<endl;
                             queue.push(ptr.get_left());
                             if(dir){
                                 if(floor[ptr.get_left().first-1][ptr.get_left().second].val== 0){
@@ -250,22 +244,8 @@ class Floor{
             Queue dirqueue[4], queue[4];
             int dir= 1;
             for(int i= 0; i<4; i++){
-                cout<<"dir= 1, i= "<<i<<endl;
                 around_point(ptr, i+1, dirqueue[i], 1);
-                Queue coo= dirqueue[i];
-                while(!coo.empty()){
-                    cout<<coo.front().first<<coo.front().second<<", ";
-                    coo.pop();
-                }
-                cout<<endl;
-                cout<<"dir= 0, i= "<<i<<endl;
                 around_point(ptr, i+1, queue[i], 0);
-                Queue co= queue[i];
-                while(!co.empty()){
-                    cout<<co.front().first<<co.front().second<<", ";
-                    co.pop();
-                }
-                cout<<endl;
                 if(i==0){
                     if(dirqueue[i]>=queue[i])
                         readyQueue= dirqueue[i];
@@ -281,7 +261,6 @@ class Floor{
                     }
                 }
             }
-            cout<<"ptr: "<<ptr.pos.first<<ptr.pos.second<<"size of queue: "<<readyQueue.size()<<endl;
         }
         void print_queue(){
             Queue copy= readyQueue;
@@ -295,15 +274,15 @@ class Floor{
             while(!readyQueue.empty()){
                 Pos tmp= readyQueue.front();
                 int distanceToCharge= get_simplepath(rst, R.pos);
-                // if(battery<=distanceToCharge){
-                //     Step+= distanceToCharge;
-                //     print_simplepath(rst, R.pos);
-                //     int distanceComeBack= get_simplepath(R.pos, tmp);
-                //     Step+= distanceComeBack;
-                //     battery= Battery- distanceComeBack;
-                //     print_simplepath(R.pos, tmp);
-                // }
-                // if(battery>distanceToCharge){
+                if(battery<=distanceToCharge){
+                    Step+= distanceToCharge;
+                    print_simplepath(rst, R.pos);
+                    int distanceComeBack= get_simplepath(R.pos, tmp);
+                    Step+= distanceComeBack;
+                    battery= Battery- distanceComeBack;
+                    print_simplepath(R.pos, tmp);
+                }
+                if(battery>distanceToCharge){
                     readyQueue.pop();
                     floor[tmp.first][tmp.second].val= 2;
                     Step++;
@@ -311,10 +290,8 @@ class Floor{
                     distanceToCharge= get_simplepath(tmp, R.pos);
                     waitingStack.push(tmp);
                     mapping.push_back(tmp);
-                    // cout<<"("<<tmp.first<<", "<<tmp.second<<")"<<endl;
-                // }
+                }
             }
-            print_floor();
         }
         void print_waitingStack(){
             Stack copy= waitingStack;
@@ -604,7 +581,6 @@ int main(int argc, char *argv[]){
     battery= Battery;
 
     //trace the floor
-    cout<<"START8------"<<endl;
     fr.waitingStack.push(R.pos);
     while(!fr.waitingStack.empty()){
         Pos tmp= fr.waitingStack.top();
@@ -621,12 +597,12 @@ int main(int argc, char *argv[]){
             if(!fr.readyQueue.empty()){
                 int stepfromnow= fr.get_simplepath(simple1, tmp);
                 int simple2ToR= fr.get_simplepath(tmp, R.pos);
-                // if(battery>stepfromnow+ simple2ToR){
-                //     Step+=stepfromnow;
-                //     battery-=stepfromnow;
-                //     fr.print_simplepath(simple1, tmp);
-                // }
-                // else{
+                if(battery>stepfromnow+ simple2ToR){
+                    Step+=stepfromnow;
+                    battery-=stepfromnow;
+                    fr.print_simplepath(simple1, tmp);
+                }
+                else{
                     int simple1ToR= fr.get_simplepath(simple1, R.pos);
                     Step+= simple1ToR;
                     fr.print_simplepath(tmp, R.pos);
@@ -634,12 +610,11 @@ int main(int argc, char *argv[]){
                     Step+= RTosimple2;
                     battery= Battery-RTosimple2;
                     fr.print_simplepath(R.pos, tmp);
-                // }
+                }
             }
         }
 
         while(!fr.readyQueue.empty()){
-                fr.print_queue();
                 fr.update_floor(tmp);
         }
         
@@ -647,11 +622,9 @@ int main(int argc, char *argv[]){
             Step+= fr.get_simplepath(tmp, R.pos);
             fr.print_simplepath(tmp, R.pos);
         }
-        fr.print_waitingStack();
     }
     print_result();
     ifile.close();
-    fr.print_floor();
     return 0;
 }
 
