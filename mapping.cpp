@@ -288,17 +288,6 @@ class Floor{
         }
         void update_floor(Pos rst){
             while(!readyQueue.empty()){
-                Queue copy= readyQueue;
-                int tracenum= 0;
-                while(!copy.empty()){
-                    if(floor[copy.front().first][copy.front().second].val!=0)
-                        tracenum++;
-                    copy.pop();
-                }
-                if(tracenum==readyQueue.size()){
-                    cout<<"pass"<<endl;
-                    break;
-                }
                 Pos tmp= readyQueue.front();
                 int distanceToCharge= get_simplepath(tmp, R.pos);
                 cout<<"distance: "<<distanceToCharge<<", battery: "<<battery<<endl;
@@ -311,14 +300,14 @@ class Floor{
                     print_simplepath(R.pos, tmp);
                 }
                 cout<<"battery:"<<battery<<endl;
-                    rst= tmp;
-                    readyQueue.pop();
-                    floor[tmp.first][tmp.second].val= 2;
-                    battery--;
-                    waitingStack.push(tmp);
-                    cout<<"STACK: ";
-                    print_waitingStack();
-                    mapping.push_back(tmp);
+                rst= tmp;
+                readyQueue.pop();
+                floor[tmp.first][tmp.second].val= 2;
+                battery--;
+                waitingStack.push(tmp);
+                cout<<"STACK: ";
+                print_waitingStack();
+                mapping.push_back(tmp);
             }
             print_floor();
         }
@@ -611,7 +600,6 @@ int main(int argc, char *argv[]){
     battery= Battery;
 
     //trace the floor
-    cout<<"START12------"<<endl;
     fr.waitingStack.push(R.pos);
     while(!fr.waitingStack.empty()){
         Pos tmp= fr.waitingStack.top();
@@ -649,26 +637,41 @@ int main(int argc, char *argv[]){
         
         if(fr.waitingStack.empty()){
             if(!fr.alterqueue.empty()){
-                while(fr.alterqueue.top().empty())
+                while(!fr.alterqueue.top().empty()){
+                    Pos p= fr.alterqueue.top().front();
+                    if(fr.floor[p.first][p.second].val== 0)
+                        break;
                     fr.alterqueue.top().pop();
-                fr.readyQueue= fr.alterqueue.top();
-                cout<<"alterqueue: "<<endl;
-                fr.print_queue();
-                fr.alterqueue.pop();
-                int stepfromnow= fr.get_simplepath(tmp, fr.readyQueue.front());
-                int simple2ToR= fr.get_simplepath(fr.readyQueue.front(), R.pos);
-                if(battery<=stepfromnow+ simple2ToR){
-                    cout<<"[charge]3"<<endl;
-                    int simple1ToR= fr.get_simplepath(tmp, R.pos);
-                    fr.print_simplepath(tmp, R.pos);
-                    int RTosimple2= fr.get_simplepath(R.pos, fr.readyQueue.front());
-                    battery= Battery-RTosimple2;
-                    fr.print_simplepath(R.pos, fr.readyQueue.front());
+                    if(fr.alterqueue.top().empty())
+                        fr.alterqueue.pop();
+                    if(fr.alterqueue.empty())
+                        break;
                 }
-                tmp= fr.readyQueue.front();
-                fr.update_floor(tmp);
+                if(!fr.alterqueue.empty()){
+                    fr.readyQueue= fr.alterqueue.top();
+                    cout<<"alterqueue: "<<endl;
+                    fr.print_queue();
+                    fr.alterqueue.pop();
+                    int stepfromnow= fr.get_simplepath(tmp, fr.readyQueue.front());
+                    int simple2ToR= fr.get_simplepath(fr.readyQueue.front(), R.pos);
+                    if(battery<=stepfromnow+ simple2ToR){
+                        cout<<"[charge]3"<<endl;
+                        int simple1ToR= fr.get_simplepath(tmp, R.pos);
+                        fr.print_simplepath(tmp, R.pos);
+                        int RTosimple2= fr.get_simplepath(R.pos, fr.readyQueue.front());
+                        battery= Battery-RTosimple2;
+                        fr.print_simplepath(R.pos, fr.readyQueue.front());
+                    }
+                    tmp= fr.readyQueue.front();
+                    fr.update_floor(tmp);
+                }
+                else{
+                    cout<<"here"<<endl;
+                    fr.print_simplepath(tmp, R.pos);
+                }
             }
             else{
+                 cout<<"here"<<endl;
                 fr.print_simplepath(tmp, R.pos);
             }
         }
