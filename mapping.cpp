@@ -46,6 +46,8 @@ Point R;
 
 class Floor{
     public:
+        Queue unreverse;
+        Stack reverse;
         Queue readyQueue;
         Stack waitingStack;
         StackQ alterqueue;
@@ -117,7 +119,6 @@ class Floor{
                     }
                 }
             }
-            print_floor();
         }
         void around_point(Point ptr, int way, Queue &queue, int dir){
             switch(way){
@@ -342,19 +343,15 @@ class Floor{
             Pos connect;
             while(!readyQueue.empty()){
                 Pos tmp= readyQueue.front();
-                int distanceToCharge= get_simplepath(tmp, R.pos);
+                int distanceToCharge= simple_path(tmp, R.pos);
                 if(battery<=distanceToCharge+1){
-                    cout<<"[charge]"<<endl;
-                    simple_path(rst, R.pos);
-                    int distanceComeBack= get_simplepath(R.pos, tmp);
+                    print_simplepath(tmp, R.pos);
+                    int distanceComeBack= simple_path(R.pos, tmp);
                     battery= Battery- distanceComeBack;
-                    cout<<"[back]"<<endl;
-                    simple_path(R.pos, tmp);
+                    print_simplepath(R.pos, tmp);
                 }
                 else{
-                    cout<<"[not to charge]"<<endl;
                     mapping.push_back(tmp);
-                    cout<<tmp.first<<tmp.second<<endl;
                 }
                 rst= tmp;
                 readyQueue.pop();
@@ -374,23 +371,26 @@ class Floor{
             }
             cout<<endl;
         }
-        void simple_path(Pos simple1, Pos simple2){
+        int simple_path(Pos simple1, Pos simple2){
+            while(!unreverse.empty()){
+                    unreverse.pop();
+            }
+            while(!reverse.empty()){
+                reverse.pop();
+            }
             bool rev= 0;
-            Stack reverse;
             if(floor[simple1.first][simple1.second].weight< floor[simple2.first][simple2.second].weight){
                 Pos tmp= simple2;
                 simple2= simple1;
                 simple1= tmp;
                 rev= 1;
-                cout<<"[reverse]"<<endl;
             }
             Pos meet1= simple1;
             Pos meet2= simple2;
             if(rev)
                 reverse.push(simple1);
             else{
-                mapping.push_back(simple1);
-                cout<<simple1.first<<simple1.second<<endl;
+                unreverse.push(simple1);
             }
             Point cur= floor[meet1.first][meet1.second];
             while(cur.weight!= floor[simple2.first][simple2.second].weight){
@@ -399,8 +399,7 @@ class Floor{
                 if(rev)
                     reverse.push(meet1);
                 else{
-                    mapping.push_back(meet1);
-                    cout<<meet1.first<<meet1.second<<endl;
+                    unreverse.push(meet1);
                 }
             }
             Stack meet2record;
@@ -410,33 +409,28 @@ class Floor{
                 if(rev)
                     reverse.push(meet1);
                 else{
-                    mapping.push_back(meet1);
-                    cout<<meet1.first<<meet1.second<<endl;
+                    unreverse.push(meet1);
                 }
                 meet2= find_to_go(meet2, cur).pos;
-                cout<<meet1.first<<meet1.second<<endl;
             }
             while(!meet2record.empty()){
                 if(rev)
                     reverse.push(meet2record.top());
                 else{
-                    mapping.push_back(meet2record.top());
-                    cout<<meet2record.top().first<<meet2record.top().second<<endl;
+                    unreverse.push(meet2record.top());
                 }
                 meet2record.pop();
             }
             if(rev){
-                while(!reverse.empty()){
-                    mapping.push_back(reverse.top());
-                    cout<<reverse.top().first<<reverse.top().second<<endl;
-                    reverse.pop();
-                }
+                return reverse.size();
             }
-            cout<<"[finish]"<<endl;
+            else{
+                return unreverse.size();
+            }
         }
 
         Point find_to_go(Pos meet1, Point cur){
-            if(meet1.first- 1>0){
+            if(meet1.first- 1>=0){
                 if(floor[meet1.first- 1][meet1.second].weight<cur.weight&& floor[meet1.first- 1][meet1.second].weight>=0)
                         cur= floor[meet1.first- 1][meet1.second];
             }
@@ -444,7 +438,7 @@ class Floor{
                 if(floor[meet1.first+ 1][meet1.second].weight<cur.weight&& floor[meet1.first+ 1][meet1.second].weight>=0)
                     cur= floor[meet1.first+ 1][meet1.second];
             }
-            if(meet1.second- 1>0){
+            if(meet1.second- 1>=0){
                 if(floor[meet1.first][meet1.second- 1].weight<cur.weight&& floor[meet1.first][meet1.second- 1].weight>=0)
                     cur= floor[meet1.first][meet1.second- 1];
             }
@@ -455,12 +449,20 @@ class Floor{
             return cur;
         }
 
-        int get_simplepath(Pos simple1, Pos simple2){
-            if(floor[simple1.first][simple1.second].weight>floor[simple2.first][simple2.second].weight){
-                return floor[simple1.first][simple1.second].weight-floor[simple2.first][simple2.second].weight;
+        void print_simplepath(Pos simple1, Pos simple2){
+            simple_path(simple1, simple2);
+            if(!reverse.empty())
+            {
+                while(!reverse.empty()){
+                    mapping.push_back(reverse.top());
+                    reverse.pop();
+                }
             }
-            else{
-                return floor[simple2.first][simple2.second].weight-floor[simple1.first][simple1.second].weight;
+            else if(!unreverse.empty()){
+                while(!unreverse.empty()){
+                    mapping.push_back(unreverse.front());
+                    unreverse.pop();
+                }
             }
         }
         
@@ -659,7 +661,6 @@ int main(int argc, char *argv[]){
 
     //trace the floor
     fr.waitingStack.push(R.pos);
-    Pos connect;
     while(!fr.waitingStack.empty()){
         Pos tmp= fr.waitingStack.top();
         fr.waitingStack.pop();
@@ -673,74 +674,66 @@ int main(int argc, char *argv[]){
                 fr.optimize_queue(fr.floor[tmp.first][tmp.second]);
             }
             if(!fr.readyQueue.empty()){
-                int stepfromnow= fr.get_simplepath(simple1, tmp);
-                int simple2ToR= fr.get_simplepath(tmp, R.pos);
+                int stepfromnow= fr.simple_path(simple1, tmp);
+                int simple2ToR= fr.simple_path(tmp, R.pos);
                 if(battery>stepfromnow+ simple2ToR){
                     battery-=stepfromnow;
-                    fr.simple_path(simple1, tmp);
+                    fr.print_simplepath(simple1, tmp);
                 }
                 else{
-                    int simple1ToR= fr.get_simplepath(simple1, R.pos);
-                    fr.simple_path(simple1, R.pos);
-                    int RTosimple2= fr.get_simplepath(R.pos, tmp);
+                    fr.print_simplepath(simple1, R.pos);
+                    int RTosimple2= fr.simple_path(R.pos, tmp);
                     battery= Battery-RTosimple2;
-                    fr.simple_path(R.pos, tmp);
+                    fr.print_simplepath(R.pos, tmp);
                 }
             }
         }
 
         while(!fr.readyQueue.empty()){
-                cout<<"tmp: "<<tmp.first<<tmp.second<<endl;
-                connect= fr.update_floor(tmp);
-                cout<<"connect: "<<connect.first<<connect.second<<endl;
+            tmp= fr.update_floor(tmp);
         }
         
         if(fr.waitingStack.empty()){
-            cout<<"full"<<endl;
             if(!fr.alterqueue.empty()){
-                cout<<"here"<<endl;
                 while(!fr.alterqueue.top().empty()){
                     Pos p= fr.alterqueue.top().front();
                     if(fr.floor[p.first][p.second].val== 0){
-                        cout<<"found out"<<endl;
                         break;
                     }
                     fr.alterqueue.top().pop();
                     if(fr.alterqueue.top().empty())
                         fr.alterqueue.pop();
                     if(fr.alterqueue.empty()){
-                        cout<<"ok"<<endl;
                         break;
                     }
                 }
                 if(!fr.alterqueue.empty()){
                     fr.readyQueue= fr.alterqueue.top();
-                    fr.print_queue();
+                    // fr.print_queue();
                     fr.alterqueue.pop();
-                    int stepfromnow= fr.get_simplepath(connect, fr.readyQueue.front());
-                    int simple2ToR= fr.get_simplepath(fr.readyQueue.front(), R.pos);
+                    int stepfromnow= fr.simple_path(tmp, fr.readyQueue.front());
+                    int simple2ToR= fr.simple_path(fr.readyQueue.front(), R.pos);
                     if(battery<=stepfromnow+ simple2ToR){
-                        int simple1ToR= fr.get_simplepath(connect, R.pos);
-                        fr.simple_path(connect, R.pos);
-                        int RTosimple2= fr.get_simplepath(R.pos, fr.readyQueue.front());
+                        fr.print_simplepath(tmp, R.pos);
+                        int RTosimple2= fr.simple_path(R.pos, fr.readyQueue.front());
                         battery= Battery-RTosimple2;
-                        fr.simple_path(R.pos, fr.readyQueue.front());
+                        fr.print_simplepath(R.pos, fr.readyQueue.front());
                     }
-                    else
-                        fr.simple_path(connect, fr.readyQueue.front());
+                    else{
+                        fr.print_simplepath(tmp, fr.readyQueue.front());
+                    }
                     tmp= fr.readyQueue.front();
-                    fr.update_floor(connect);
+                    fr.update_floor(tmp);
                 }
                 else{
-                    fr.simple_path(connect, R.pos);
+                    fr.simple_path(tmp, R.pos);
                 }
             }
             else{
-                fr.simple_path(connect, R.pos);
+                fr.simple_path(tmp, R.pos);
             }
         }
     }
-    fr.print_floor();
     print_result();
     ifile.close();
     return 0;
