@@ -67,7 +67,7 @@ class Floor{
         void print_floor(){
             for(int j= 0; j< row; j++){
                 for(int i= 0; i< col; i++)
-                    cout<<floor[j][i].val<<"  ";
+                    cout<<floor[j][i].weight<<"  ";
                 cout<<endl;
             }
         }
@@ -340,28 +340,23 @@ class Floor{
             cout<<endl;
         }
         Pos update_floor(Pos rst){
-            Pos connect;
             while(!readyQueue.empty()){
                 Pos tmp= readyQueue.front();
-                int distanceToCharge= simple_path(tmp, R.pos);
-                if(battery<=distanceToCharge+1){
-                    print_simplepath(tmp, R.pos);
-                    int distanceComeBack= simple_path(R.pos, tmp);
-                    battery= Battery- distanceComeBack;
+                if(battery<floor[tmp.first][tmp.second].weight+1){
+                    print_simplepath(rst, R.pos);
+                    battery= Battery- floor[tmp.first][tmp.second].weight;
                     print_simplepath(R.pos, tmp);
                 }
                 else{
                     mapping.push_back(tmp);
+                    battery--;
                 }
                 rst= tmp;
                 readyQueue.pop();
                 floor[tmp.first][tmp.second].val= 2;
-                battery--;
                 waitingStack.push(tmp);
-                if(!readyQueue.empty())
-                    connect= tmp;
             }
-            return connect;
+            return rst;
         }
         void print_waitingStack(){
             Stack copy= waitingStack;
@@ -675,15 +670,13 @@ int main(int argc, char *argv[]){
             }
             if(!fr.readyQueue.empty()){
                 int stepfromnow= fr.simple_path(simple1, tmp);
-                int simple2ToR= fr.simple_path(tmp, R.pos);
-                if(battery>stepfromnow+ simple2ToR){
+                if(battery>stepfromnow+ fr.floor[tmp.first][tmp.second].weight){
                     battery-=stepfromnow;
                     fr.print_simplepath(simple1, tmp);
                 }
                 else{
                     fr.print_simplepath(simple1, R.pos);
-                    int RTosimple2= fr.simple_path(R.pos, tmp);
-                    battery= Battery-RTosimple2;
+                    battery= Battery-fr.floor[tmp.first][tmp.second].weight;
                     fr.print_simplepath(R.pos, tmp);
                 }
             }
@@ -695,28 +688,27 @@ int main(int argc, char *argv[]){
         
         if(fr.waitingStack.empty()){
             if(!fr.alterqueue.empty()){
-                while(!fr.alterqueue.top().empty()){
-                    Pos p= fr.alterqueue.top().front();
-                    if(fr.floor[p.first][p.second].val== 0){
-                        break;
+                while(!fr.alterqueue.empty()&&!fr.alterqueue.top().empty()){
+                    while(!fr.alterqueue.top().empty()){
+                        if(fr.floor[fr.alterqueue.top().front().first][fr.alterqueue.top().front().second].val!= 0)
+                            fr.alterqueue.top().pop();
+                        else
+                            break;
                     }
-                    fr.alterqueue.top().pop();
-                    if(fr.alterqueue.top().empty())
+                    if(fr.alterqueue.top().empty()){
                         fr.alterqueue.pop();
-                    if(fr.alterqueue.empty()){
-                        break;
                     }
+                    else
+                        break;
                 }
                 if(!fr.alterqueue.empty()){
                     fr.readyQueue= fr.alterqueue.top();
-                    // fr.print_queue();
                     fr.alterqueue.pop();
                     int stepfromnow= fr.simple_path(tmp, fr.readyQueue.front());
-                    int simple2ToR= fr.simple_path(fr.readyQueue.front(), R.pos);
-                    if(battery<=stepfromnow+ simple2ToR){
+                    int simple2ToR= fr.floor[fr.readyQueue.front().first][fr.readyQueue.front().second].weight;
+                    if(battery<stepfromnow+ simple2ToR){
                         fr.print_simplepath(tmp, R.pos);
-                        int RTosimple2= fr.simple_path(R.pos, fr.readyQueue.front());
-                        battery= Battery-RTosimple2;
+                        battery= Battery- simple2ToR;
                         fr.print_simplepath(R.pos, fr.readyQueue.front());
                     }
                     else{
@@ -726,11 +718,11 @@ int main(int argc, char *argv[]){
                     fr.update_floor(tmp);
                 }
                 else{
-                    fr.simple_path(tmp, R.pos);
+                    fr.print_simplepath(tmp, R.pos);
                 }
             }
             else{
-                fr.simple_path(tmp, R.pos);
+                fr.print_simplepath(tmp, R.pos);
             }
         }
     }
