@@ -1,7 +1,7 @@
-# :robot_face: Mapping Robot Algorithm
+# Mapping Robot Algorithm
 
 ### Description
-The goal of this project is to create a efficient path for robot to pass the whole area depends on different input.
+The goal of this project is to create a efficient path for robot to pass the whole area depends on different input.:robot_face:
 
 ### Main flow chart
 ![](https://i.imgur.com/iA07iBW.png)
